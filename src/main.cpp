@@ -8,7 +8,7 @@ Sd2Card card;
 SdVolume volume;
 SdFile root;
 
-const int chipSelect = PB0;
+#define SD_CS_PIN PB0;
 
 #define DT 0.02       // Loop time
 #define AA 0.97       // complementary filter constant
@@ -50,7 +50,7 @@ void setup() {
 
     // we'll use the initialization code from the utility libraries
     // since we're just testing if the card is working!
-    if (!card.init(SPI_HALF_SPEED, chipSelect)) {
+    if (!card.init(SPI_HALF_SPEED, SD_CS_PIN)) {
       Serial.println("initialization failed. Things to check:");
       Serial.println("* is a card inserted?");
       Serial.println("* is your wiring correct?");
