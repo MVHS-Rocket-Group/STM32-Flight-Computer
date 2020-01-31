@@ -1,65 +1,40 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <Arduino_LSM9DS1.h>
-#include <constants.h>
-
-#define SD_CS_PIN PB0
-
-Sd2Card card;
-SdVolume volume;
-SdFile root;
+#include <Wire.h>             // I2C comms support for IMU, Barometer
+#include <SPI.h>              // SPI comms support for SD
+#include <SD.h>               // For SD Card
+#include <Arduino_LSM9DS1.h>  // For LSM9DS01 IMU
+#include <constants.h>        // Constants
+#include <helpers.h>          // Helper objects
 
 void setup() {
-  Serial.begin(9600);
+  // Begin serial connection.
+  Serial.begin(SERIAL_TERM_BAUD);
   while (!Serial);
+
+  // Wait for 5 seconds to allow for terminal connection.
   for (uint32_t i = 0; i < 5; i++) {
     Serial.print(".");
     delay(500);
   }
   Serial.println();
 
-  // I2C device detector
-  {
-    int count = 0;
-    Wire.begin();
-    for (byte i = 8; i < 120; i++)
-    {
-      Wire.beginTransmission (i);
-      if (Wire.endTransmission () == 0)
-        {
-        Serial.print ("Found address: ");
-        Serial.print (i, DEC);
-        Serial.print (" (0x");
-        Serial.print (i, HEX);
-        Serial.println (")");
-        count++;
-        delay (1);  // maybe unneeded?
-        } // end of good response
-    } // end of for loop
-    Serial.println ("Done.");
-    Serial.print ("Found ");
-    Serial.print (count, DEC);
-    Serial.println (" device(s).");
-  }
+  search_I2C_bus();
 
   if (!IMU.begin()) {
     Serial.println("Failed to initialize IMU!");
     while (1);
   }
 
-  // SD Card demo
+  // SD Card demo.
   {
+    Sd2Card card;
+    SdVolume volume;
+    SdFile root;
+
     Serial.print("\nInitializing SD card...");
 
-    // we'll use the initialization code from the utility libraries
-    // since we're just testing if the card is working!
     if (!card.init(SPI_HALF_SPEED, SD_CS_PIN)) {
       Serial.println("initialization failed. Things to check:");
-      Serial.println("* is a card inserted?");
-      Serial.println("* is your wiring correct?");
-      Serial.println("* did you change the chipSelect pin to match your shield or module?");
       while (1);
     } else {
       Serial.println("Wiring is correct and a card is present.");
@@ -124,32 +99,32 @@ void setup() {
 void loop() {
   float x, y, z;
 
-  if (IMU.accelerationAvailable()) {
-    IMU.readAcceleration(x, y, z);
+  IMU.readAcceleration(x, y, z);
 
-    Serial.print("acc: (g's) ");
-    Serial.print(x);
-    Serial.print(' ');
-    Serial.print(y);
-    Serial.print(' ');
-    Serial.print(z);
+  Serial.print("acc: (g's) ");
+  Serial.print(x);
+  Serial.print(' ');
+  Serial.print(y);
+  Serial.print(' ');
+  Serial.print(z);
 
-    IMU.readGyroscope(x, y, z);
+  IMU.readGyroscope(x, y, z);
 
-    Serial.print("\tgyro: (deg/s) ");
-    Serial.print(x);
-    Serial.print(' ');
-    Serial.print(y);
-    Serial.print(' ');
-    Serial.print(z);
+  Serial.print("\tgyro: (deg/s) ");
+  Serial.print(x);
+  Serial.print(' ');
+  Serial.print(y);
+  Serial.print(' ');
+  Serial.print(z);
 
-    IMU.readMagneticField(x, y, z);
+  IMU.readMagneticField(x, y, z);
 
-    Serial.print("\tmag: (uT) ");
-    Serial.print(x);
-    Serial.print(' ');
-    Serial.print(y);
-    Serial.print(' ');
-    Serial.println(z);
-  }
+  Serial.print("\tmag: (uT) ");
+  Serial.print(x);
+  Serial.print(' ');
+  Serial.print(y);
+  Serial.print(' ');
+  Serial.println(z);
+
+  delay(10);
 }
