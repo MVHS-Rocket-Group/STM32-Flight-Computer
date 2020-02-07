@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <array>
+#include <array>              // en.cppreference.com/w/cpp/container/array
 #include <Wire.h>             // I2C comms support for IMU, Barometer
 #include <SPI.h>              // SPI comms support for SD
 #include <SD.h>               // For SD Card
@@ -8,10 +8,10 @@
 #include <constants.h>        // Constants
 #include <helpers.h>          // Helper objects
 
-Adafruit_BMP280 bmp; // use I2C interface
+Adafruit_BMP280 bmp;
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
-String logFile = "";    // Path to currently in-use log file
+String logFile = "";    // Path on SD card to current log file.
 
 void setup() {
   // Begin serial connection.
@@ -19,100 +19,31 @@ void setup() {
   while (!Serial);
 
   // Wait for 5 seconds to allow for terminal connection.
-  for (uint32_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < 5; i++) {
     Serial.print(".");
     delay(500);
   }
   Serial.println();
 
+  // For debug purposes only... lists all available I2C devices.
   search_I2C_bus();
 
   if (!IMU.begin()) {
-    Serial.println("Failed to initialize IMU!");
+    logErr("Failed IMU initialization!");
     while (1);
   }
 
   if (!bmp.begin()) {
-    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+    logErr("Failed BMP280 initialization!");
     while (1);
   }
 
-  /* Default settings from datasheet. */
+  // Set default settings from datasheet.
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
                   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
-
-  // SD Card demo.
-  if (false){
-    Sd2Card card;
-    SdVolume volume;
-    SdFile root;
-
-    Serial.print("\nInitializing SD card...");
-
-    if (!card.init(SPI_HALF_SPEED, SD_CS_PIN)) {
-      Serial.println("initialization failed. Things to check:");
-      while (1);
-    } else {
-      Serial.println("Wiring is correct and a card is present.");
-    }
-
-    // print the type of card
-    Serial.println();
-    Serial.print("Card type:         ");
-    switch (card.type()) {
-      case SD_CARD_TYPE_SD1:
-        Serial.println("SD1");
-        break;
-      case SD_CARD_TYPE_SD2:
-        Serial.println("SD2");
-        break;
-      case SD_CARD_TYPE_SDHC:
-        Serial.println("SDHC");
-        break;
-      default:
-        Serial.println("Unknown");
-    }
-
-    // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
-    if (!volume.init(card)) {
-      Serial.println("Could not find FAT16/FAT32 partition.\nMake sure you've formatted the card");
-      while (1);
-    }
-
-    Serial.print("Clusters:          ");
-    Serial.println(volume.clusterCount());
-    Serial.print("Blocks x Cluster:  ");
-    Serial.println(volume.blocksPerCluster());
-
-    Serial.print("Total Blocks:      ");
-    Serial.println(volume.blocksPerCluster() * volume.clusterCount());
-    Serial.println();
-
-    // print the type and size of the first FAT-type volume
-    uint32_t volumesize;
-    Serial.print("Volume type is:    FAT");
-    Serial.println(volume.fatType(), DEC);
-
-    volumesize = volume.blocksPerCluster();    // clusters are collections of blocks
-    volumesize *= volume.clusterCount();       // we'll have a lot of clusters
-    volumesize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1KB)
-    Serial.print("Volume size (Kb):  ");
-    Serial.println(volumesize);
-    Serial.print("Volume size (Mb):  ");
-    volumesize /= 1024;
-    Serial.println(volumesize);
-    Serial.print("Volume size (Gb):  ");
-    Serial.println((float)volumesize / 1024.0);
-
-    Serial.println("\nFiles found on the card (name, date and size in bytes): ");
-    root.openRoot(volume);
-
-    // list all files in the card with date and size
-    root.ls(LS_R | LS_DATE | LS_SIZE);
-  }
 
   {  // Init SD file IO
     logMsg("\nSD card init...");
@@ -140,7 +71,7 @@ void setup() {
     if (log) {
       log.println(State::header_line());
       log.close();
-      logMsg("Header Line Written");
+      logMsg("CSV log header line written");
     } else
       logErr("Error opening " + (String)logFile);
   }
@@ -159,6 +90,8 @@ void loop() {
     IMU.readAcceleration(acc_raw[0], acc_raw[1], acc_raw[2]);
     IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
     IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
+    // Adjust acceleration measurements from g's to m/s^2.
+    for(uint8_t i = 0; i < 3; i++) acc_raw[i] = acc_raw[i] * 9.81;
 
     sensors_event_t temp_event, pressure_event;
     bmp_temp->getEvent(&temp_event);
@@ -180,8 +113,6 @@ void loop() {
     }
 
     delay(10);
-    Serial.print("Loop took: ");
-    Serial.print(millis() - begin);
-    Serial.println("ms");
+    logMsg("Loop took: " + (String)(millis() - begin) + "ms");
   }
 }

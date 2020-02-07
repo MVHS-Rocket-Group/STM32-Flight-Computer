@@ -15,9 +15,8 @@ void search_I2C_bus() {
     if (Wire.endTransmission () == 0) {
       Serial.print("\tFound: ");
       Serial.print(i, DEC);
-      Serial.print(" (0x");
-      Serial.print(i, HEX);
-      Serial.println(")");
+      Serial.print(" aka. 0x");
+      Serial.println(i, HEX);
       count++;
       delay(1);  // maybe unneeded?
     } // end of good response
