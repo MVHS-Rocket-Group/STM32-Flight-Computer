@@ -7,6 +7,7 @@
 #include <array>
 
 // Searches for devices at all available addresses on the I2C bus and prints results.
+// Common address associations: https://cdn-learn.adafruit.com/downloads/pdf/i2c-addresses.pdf
 void search_I2C_bus() {
   int count = 0;
   Wire.begin();

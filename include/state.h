@@ -4,6 +4,7 @@
 #include <constants.h>        // Constants
 #include <helpers.h>          // Helper objects
 #include <array>
+#include <vector>
 
 enum FlightState { ON_PAD, LAUNCHED, IN_FREEFALL, LANDED};
 // https://stackoverflow.com/a/5094430/3339274
@@ -19,14 +20,14 @@ inline String FlightState_to_string(FlightState state) {
 
 struct State {
  public:
-  double _time;       // Time since boot (millis)
+  double _time;                       // Time since boot (millis)
   FlightState _flight_state;
+  std::vector<String> _events_list;    // String list of event labels.
 
   // Raw sensor readings
   std::array<double, 3> _acc_raw;     // Acceleration (m/s^2)
   std::array<double, 3> _gyro_raw;    // Angular velocity (deg/s)
   std::array<double, 3> _mag_raw;     // Magnetometer values (uT)
-
   double _press_raw;                  // Atmospheric pressure (hPa)
   double _temp_raw;                   // Ambient temperature (C)
 
@@ -34,7 +35,6 @@ struct State {
   std::array<double, 3> _acc_f;       // Acceleration (m/s^2)
   std::array<double, 3> _gyro_f;      // Angular velocity (deg/s)
   std::array<double, 3> _mag_f;       // Magnetometer values (uT)
-
   double _press_f;                    // Atmospheric pressure (hPa)
   double _temp_f;                     // Ambient temperature (C)
 
@@ -50,20 +50,25 @@ struct State {
     _time = millis() / 1000.0;
   }
 
+  void add_event(String event) { _events_list.push_back(event); }
+
   static String header_line() {
     // https://stackoverflow.com/a/3859167/3339274
     return "time, flight_state, acc_x_raw, acc_y_raw, acc_z_raw, gyro_x_raw, "
            "gyro_y_raw, gyro_z_raw, mag_x_raw, mag_y_raw, mag_z_raw, press_raw, "
            "temp_raw, acc_x_f, acc_y_f, acc_z_f, gyro_x_f, gyro_y_f, gyro_z_f, "
-           "mag_x_f, mag_y_f, mag_z_f, press_f, temp_f";
+           "mag_x_f, mag_y_f, mag_z_f, press_f, temp_f, events";
   }
 
   String format_log_line() {
+    String events_str = "";
+    for(String event : _events_list) events_str += event + " ";
+
     return (String)_time + ", " + FlightState_to_string(_flight_state) + ", " +
            (String)_acc_raw[0] + ", " + (String)_acc_raw[1] + ", " + (String)_acc_raw[2] + ", " +
            (String)_gyro_raw[0] + ", " + (String)_gyro_raw[1] + ", " + (String)_gyro_raw[2] + ", " +
            (String)_mag_raw[0] + ", " + (String)_mag_raw[1] + ", " + (String)_mag_raw[2] + ", " +
-           (String)_press_raw + ", " + (String)_temp_raw;
+           (String)_press_raw + ", " + (String)_temp_raw + ", " + events_str;
   }
 };
 
