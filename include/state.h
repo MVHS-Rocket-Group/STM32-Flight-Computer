@@ -23,20 +23,20 @@ struct State {
   FlightState _flight_state;
 
   // Raw sensor readings
-  std::array<double, 3> _acc_raw;          // Acceleration (m/s^2)
-  std::array<double, 3> _gyro_raw;         // Angular velocity (deg/s)
-  std::array<double, 3> _mag_raw;          // Magnetometer values (uT)
+  std::array<double, 3> _acc_raw;     // Acceleration (m/s^2)
+  std::array<double, 3> _gyro_raw;    // Angular velocity (deg/s)
+  std::array<double, 3> _mag_raw;     // Magnetometer values (uT)
 
-  double _press_raw;           // Atmospheric pressure (hPa)
-  double _temp_raw;            // Ambient temperature (C)
+  double _press_raw;                  // Atmospheric pressure (hPa)
+  double _temp_raw;                   // Ambient temperature (C)
 
   // Filtered sensor readings (rolling average)
-  std::array<double, 3> _acc_f;            // Acceleration (m/s^2)
-  std::array<double, 3> _gyro_f;           // Angular velocity (deg/s)
-  std::array<double, 3> _mag_f;            // Magnetometer values (uT)
+  std::array<double, 3> _acc_f;       // Acceleration (m/s^2)
+  std::array<double, 3> _gyro_f;      // Angular velocity (deg/s)
+  std::array<double, 3> _mag_f;       // Magnetometer values (uT)
 
-  double _press_f;             // Atmospheric pressure (hPa)
-  double _temp_f;              // Ambient temperature (C)
+  double _press_f;                    // Atmospheric pressure (hPa)
+  double _temp_f;                     // Ambient temperature (C)
 
   // Auto-populate fields from sensors.
   // TODO: Implement FlightState!

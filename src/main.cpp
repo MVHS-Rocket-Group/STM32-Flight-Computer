@@ -81,43 +81,41 @@ void setup() {
 }
 
 void loop() {
-  {
-    // CodeTimer("void loop()");
-    unsigned long begin = millis();
-    std::array<double, 3> acc_raw;  // Acceleration (m/s^2)
-    std::array<double, 3> gyro_raw; // Angular velocity (deg/s)
-    std::array<double, 3> mag_raw;  // Magnetometer values (uT)
-    double press_raw;               // Atmospheric pressure (hPa)
-    double temp_raw;                // Ambient temperature (C)
+  // CodeTimer("void loop()");
+  unsigned long begin = millis();
+  std::array<double, 3> acc_raw;  // Acceleration (m/s^2)
+  std::array<double, 3> gyro_raw; // Angular velocity (deg/s)
+  std::array<double, 3> mag_raw;  // Magnetometer values (uT)
+  double press_raw;               // Atmospheric pressure (hPa)
+  double temp_raw;                // Ambient temperature (C)
 
-    IMU.readAcceleration(acc_raw[0], acc_raw[1], acc_raw[2]);
-    IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
-    IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
-    // Adjust acceleration measurements from g's to m/s^2.
-    for(uint8_t i = 0; i < 3; i++) acc_raw[i] = acc_raw[i] * 9.81;
+  IMU.readAcceleration(acc_raw[0], acc_raw[1], acc_raw[2]);
+  IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
+  IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
+  // Adjust acceleration measurements from g's to m/s^2.
+  for(uint8_t i = 0; i < 3; i++) acc_raw[i] = acc_raw[i] * 9.81;
 
-    sensors_event_t temp_event, pressure_event;
-    bmp_temp->getEvent(&temp_event);
-    bmp_pressure->getEvent(&pressure_event);
-    temp_raw = temp_event.temperature;
-    press_raw = pressure_event.pressure;
+  sensors_event_t temp_event, pressure_event;
+  bmp_temp->getEvent(&temp_event);
+  bmp_pressure->getEvent(&pressure_event);
+  temp_raw = temp_event.temperature;
+  press_raw = pressure_event.pressure;
 
-    State state(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw, acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
-    filter.add_data(&state);
-    filter.calculate_filter(&state);
+  State state(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw, acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
+  filter.add_data(&state);
+  filter.calculate_filter(&state);
 
-    {  // Write state info to SD file, log to serial
-      File log = SD.open(logFile, FILE_WRITE);
-      if (log) {
-        String msg = state.format_log_line();
-        logMsg(msg);
-        log.println(msg);
-        log.close();
-      } else
-        logErr("Error opening " + (String)logFile);
-    }
-
-    delay(10);
-    logMsg("Loop took: " + (String)(millis() - begin) + "ms");
+  {  // Write state info to SD file, log to serial
+    File log = SD.open(logFile, FILE_WRITE);
+    if (log) {
+      String msg = state.format_log_line();
+      logMsg(msg);
+      log.println(msg);
+      log.close();
+    } else
+      logErr("Error opening " + (String)logFile);
   }
+
+  delay(10);
+  logMsg("Loop took: " + (String)(millis() - begin) + "ms");
 }
