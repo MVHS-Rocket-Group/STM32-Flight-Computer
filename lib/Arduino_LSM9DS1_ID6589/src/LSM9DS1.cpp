@@ -90,7 +90,7 @@ void LSM9DS1Class::end()
   _wire->end();
 }
 
-int LSM9DS1Class::readAcceleration(float& x, float& y, float& z)
+int LSM9DS1Class::readAcceleration(double& x, double& y, double& z)
 {
   int16_t data[3];
 
@@ -123,7 +123,7 @@ float LSM9DS1Class::accelerationSampleRate()
   return 119.0F;
 }
 
-int LSM9DS1Class::readGyroscope(float& x, float& y, float& z)
+int LSM9DS1Class::readGyroscope(double& x, double& y, double& z)
 {
   int16_t data[3];
 
@@ -156,7 +156,7 @@ float LSM9DS1Class::gyroscopeSampleRate()
   return 119.0F;
 }
 
-int LSM9DS1Class::readMagneticField(float& x, float& y, float& z)
+int LSM9DS1Class::readMagneticField(double& x, double& y, double& z)
 {
   int16_t data[3];
 

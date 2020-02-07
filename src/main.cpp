@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <array>
 #include <Wire.h>             // I2C comms support for IMU, Barometer
 #include <SPI.h>              // SPI comms support for SD
 #include <SD.h>               // For SD Card
@@ -10,6 +11,7 @@
 Adafruit_BMP280 bmp; // use I2C interface
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
+String logFile = "";    // Path to currently in-use log file
 
 void setup() {
   // Begin serial connection.
@@ -32,7 +34,7 @@ void setup() {
 
   if (!bmp.begin()) {
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
-    while (1) delay(10);
+    while (1);
   }
 
   /* Default settings from datasheet. */
@@ -42,10 +44,8 @@ void setup() {
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
-  bmp_temp->printSensorDetails();
-
   // SD Card demo.
-  {
+  if (false){
     Sd2Card card;
     SdVolume volume;
     SdFile root;
@@ -113,47 +113,75 @@ void setup() {
     // list all files in the card with date and size
     root.ls(LS_R | LS_DATE | LS_SIZE);
   }
+
+  {  // Init SD file IO
+    logMsg("\nSD card init...");
+    if (!SD.begin(SD_CS_PIN)) {
+      logErr("SD Card failed, or not present");
+      while (1) {
+      }
+    }
+    logMsg("SD card initialized");
+  }
+
+  {  // Find out what the latest log file is, and use the next one
+    int num = 0;
+    while (logFile == "") {
+      if (SD.exists("log" + (String)num + ".csv"))
+        num++;
+      else
+        logFile = "log" + (String)num + ".csv";
+    }
+    logMsg("Using log file: " + (String)logFile);
+  }
+
+  {  // Send header line
+    File log = SD.open(logFile, FILE_WRITE);
+    if (log) {
+      log.println(State::header_line());
+      log.close();
+      logMsg("Header Line Written");
+    } else
+      logErr("Error opening " + (String)logFile);
+  }
 }
 
 void loop() {
-  float x, y, z;
+  {
+    // CodeTimer("void loop()");
+    unsigned long begin = millis();
+    std::array<double, 3> acc_raw;  // Acceleration (m/s^2)
+    std::array<double, 3> gyro_raw; // Angular velocity (deg/s)
+    std::array<double, 3> mag_raw;  // Magnetometer values (uT)
+    double press_raw;               // Atmospheric pressure (hPa)
+    double temp_raw;                // Ambient temperature (C)
 
-  IMU.readAcceleration(x, y, z);
+    IMU.readAcceleration(acc_raw[0], acc_raw[1], acc_raw[2]);
+    IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
+    IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
 
-  Serial.print("acc: (g's) ");
-  Serial.print(x);
-  Serial.print(' ');
-  Serial.print(y);
-  Serial.print(' ');
-  Serial.print(z);
+    sensors_event_t temp_event, pressure_event;
+    bmp_temp->getEvent(&temp_event);
+    bmp_pressure->getEvent(&pressure_event);
+    temp_raw = temp_event.temperature;
+    press_raw = pressure_event.pressure;
 
-  IMU.readGyroscope(x, y, z);
+    State state(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw, acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
 
-  Serial.print("\tgyro: (deg/s) ");
-  Serial.print(x);
-  Serial.print(' ');
-  Serial.print(y);
-  Serial.print(' ');
-  Serial.print(z);
+    {  // Write state info to SD file, log to serial
+      File log = SD.open(logFile, FILE_WRITE);
+      if (log) {
+        String msg = state.format_log_line();
+        logMsg(msg);
+        log.println(msg);
+        log.close();
+      } else
+        logErr("Error opening " + (String)logFile);
+    }
 
-  IMU.readMagneticField(x, y, z);
-
-  Serial.print("\tmag: (uT) ");
-  Serial.print(x);
-  Serial.print(' ');
-  Serial.print(y);
-  Serial.print(' ');
-  Serial.println(z);
-
-  sensors_event_t temp_event, pressure_event;
-  bmp_temp->getEvent(&temp_event);
-  bmp_pressure->getEvent(&pressure_event);
-
-  Serial.print(F("\ttemp: (C) "));
-  Serial.println(temp_event.temperature);
-
-  Serial.print(F("\tPress: (hPa) "));
-  Serial.println(pressure_event.pressure);
-
-  delay(10);
+    delay(10);
+    Serial.print("Loop took: ");
+    Serial.print(millis() - begin);
+    Serial.println("ms");
+  }
 }

@@ -29,17 +29,17 @@ class LSM9DS1Class {
     void end();
 
     // Accelerometer
-    virtual int readAcceleration(float& x, float& y, float& z); // Results are in G (earth gravity).
+    virtual int readAcceleration(double& x, double& y, double& z); // Results are in G (earth gravity).
     virtual int accelerationAvailable(); // Number of samples in the FIFO.
     virtual float accelerationSampleRate(); // Sampling rate of the sensor.
 
     // Gyroscope
-    virtual int readGyroscope(float& x, float& y, float& z); // Results are in degrees/second.
+    virtual int readGyroscope(double& x, double& y, double& z); // Results are in degrees/second.
     virtual int gyroscopeAvailable(); // Number of samples in the FIFO.
     virtual float gyroscopeSampleRate(); // Sampling rate of the sensor.
 
     // Magnetometer
-    virtual int readMagneticField(float& x, float& y, float& z); // Results are in uT (micro Tesla).
+    virtual int readMagneticField(double& x, double& y, double& z); // Results are in uT (micro Tesla).
     virtual int magneticFieldAvailable(); // Number of samples in the FIFO.
     virtual float magneticFieldSampleRate(); // Sampling rate of the sensor.
 
