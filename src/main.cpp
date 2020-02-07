@@ -31,34 +31,38 @@ void setup() {
   // For debug purposes only... lists all available I2C devices.
   search_I2C_bus();
 
-  if (!IMU.begin()) {
-    logErr("Failed IMU initialization!");
-    while (1);
+  { // I2C sensor init...
+    logMsg("Begin: initializing IMU...");
+    if (!IMU.begin()) {
+      logErr("Failed IMU initialization!");
+      while (1);
+    } else logMsg("End: initializing IMU.");
+
+    logMsg("Begin: initializing BMP280...");
+    if (!bmp.begin()) {
+      logErr("Failed BMP280 initialization!");
+      while (1);
+    } else logMsg("End: initializing BMP280.");
   }
 
-  if (!bmp.begin()) {
-    logErr("Failed BMP280 initialization!");
-    while (1);
-  }
-
-  // Set default settings from datasheet.
+  // Set default settings for BMP280 from datasheet.
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
                   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
-  {  // Init SD file IO
-    logMsg("\nSD card init...");
+  { // SPI SD card init...
+    logMsg("Begin: SD card init...");
     if (!SD.begin(SD_CS_PIN)) {
       logErr("SD Card failed, or not present");
-      while (1) {
-      }
+      while (1);
     }
-    logMsg("SD card initialized");
+    logMsg("End: SD card init.");
   }
 
-  {  // Find out what the latest log file is, and use the next one
+  { // Log file init...
+    // Find out what the latest log file is, and use the next one
     int num = 0;
     while (logFile == "") {
       if (SD.exists("log" + (String)num + ".csv"))
@@ -67,9 +71,8 @@ void setup() {
         logFile = "log" + (String)num + ".csv";
     }
     logMsg("Using log file: " + (String)logFile);
-  }
 
-  {  // Send header line
+    // Send header line
     File log = SD.open(logFile, FILE_WRITE);
     if (log) {
       log.println(State::header_line());
