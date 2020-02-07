@@ -11,20 +11,20 @@ void search_I2C_bus() {
   int count = 0;
   Wire.begin();
   Serial.println("Searching for I2C Devices...");
+
   for (byte i = 8; i < 120; i++) {
-    Wire.beginTransmission (i);
-    if (Wire.endTransmission () == 0) {
+    Wire.beginTransmission(i);
+    if (Wire.endTransmission() == 0) {
       Serial.print("\tFound: ");
       Serial.print(i, DEC);
       Serial.print(" aka. 0x");
       Serial.println(i, HEX);
       count++;
-      delay(1);  // maybe unneeded?
-    } // end of good response
-  } // end of for loop
-  Serial.print("Found ");
-  Serial.print(count, DEC);
-  Serial.println(" device(s).");
+      delay(1);
+    }
+  }
+
+  Serial.println("Found " + (String)count + " device(s).");
 }
 
 // Log the debug message only if the DEBUG flag is set

@@ -1,18 +1,20 @@
 #include <Arduino.h>
-#include <array>              // en.cppreference.com/w/cpp/container/array
-#include <Wire.h>             // I2C comms support for IMU, Barometer
-#include <SPI.h>              // SPI comms support for SD
-#include <SD.h>               // For SD Card
-#include <Arduino_LSM9DS1.h>  // For LSM9DS01 IMU
-#include <Adafruit_BMP280.h>  // For BMP280 Barometer
-#include <constants.h>        // Constants
-#include <helpers.h>          // Helper objects
-#include <state.h>            // State class
+#include <array>                // en.cppreference.com/w/cpp/container/array
+#include <Wire.h>               // I2C comms support for IMU, Barometer
+#include <SPI.h>                // SPI comms support for SD
+#include <SD.h>                 // For SD Card
+#include <Arduino_LSM9DS1.h>    // For LSM9DS01 IMU
+#include <Adafruit_BMP280.h>    // For BMP280 Barometer
+#include <constants.h>          // Constants
+#include <helpers.h>            // Helper objects
+#include <state.h>              // State class
+#include <mean_sensor_filter.h> // MeanSensorFilter class
 
 Adafruit_BMP280 bmp;
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 String logFile = "";    // Path on SD card to current log file.
+MeanSensorFilter filter(25);
 
 void setup() {
   // Begin serial connection.
@@ -101,6 +103,8 @@ void loop() {
     press_raw = pressure_event.pressure;
 
     State state(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw, acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
+    filter.add_data(&state);
+    filter.calculate_filter(&state);
 
     {  // Write state info to SD file, log to serial
       File log = SD.open(logFile, FILE_WRITE);
