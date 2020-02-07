@@ -7,6 +7,7 @@
 #include <Adafruit_BMP280.h>  // For BMP280 Barometer
 #include <constants.h>        // Constants
 #include <helpers.h>          // Helper objects
+#include <state.h>            // State class
 
 Adafruit_BMP280 bmp;
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
