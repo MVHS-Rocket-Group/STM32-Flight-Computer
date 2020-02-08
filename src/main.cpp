@@ -45,6 +45,20 @@ void setup() {
     } else logMsg("End: initializing BMP280.");
   }
 
+  { // ESC PWM init...
+    logMsg("Begin: ESC MIN_COMMAND calibration...");
+    analogWriteResolution(PWM_WRITE_RES);
+    analogWriteFrequency(PWM_FREQ);
+    pinMode(PWM_POD1_PIN, OUTPUT);
+    pinMode(PWM_POD2_PIN, OUTPUT);
+
+    // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC self-calibrate.
+    analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
+    analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+    delay(3000);
+    logMsg("END: ESC MIN_COMMAND calibration.");
+  }
+
   // Set default settings for BMP280 from datasheet.
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */

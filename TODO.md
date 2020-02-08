@@ -12,9 +12,9 @@
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
 - Arming switch toggle (*use software interrupt*)
+  - Move ESC calibration to `void loop()`, only execute once armed
 - ~~Implement `CALIBRATING` and `DISARMED` states in `FlightState` enum type~~
   - ~~Rename `ON_PAD` state to `ARMED`~~
-- Move ESC calibration to `void loop()`, only execute once armed
 - Implement usage of `FlightState` in `void loop()`
 - Implement event tracking, add as detected to state vector
 - Verify that pin assignments in `constants.h` match reality
