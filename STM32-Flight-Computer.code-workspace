@@ -53,8 +53,12 @@
 		},
 		"cSpell.words": [
 			"ESCs",
+			"FTDI",
 			"Ozzymaker",
 			"STSTM",
+			"UART",
+			"ebug",
+			"erial",
 			"gitattributes",
 			"gitignore",
 			"ldscripts",
