@@ -1,6 +1,6 @@
 # STM32-Flight-Computer
 
-![Travis-CI Build Status](https://travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer.svg?branch=master))
+![Travis-CI Build Status](https://travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer.svg?branch=master)
 
 ## Repository Structure
 
