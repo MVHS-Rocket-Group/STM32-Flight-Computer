@@ -23,9 +23,11 @@
 
 STM32 (*Blue Pill development board, `STM32F103C8T6` MCU part*) flight computer and FDR for high-power SRM rockets. This program is developed in conjunction with the [PlatformIO](https://platformio.org) IDE system with integration into VSCode and Atom editors, a substantial upgrade from the oxymoron Arduino IDE.
 
+Program upload and line-by-line debugging support is provided by the wonderful [ST-Link V2](https://smile.amazon.com/Aideepen-ST-Link-Programming-Emulator-Downloader/dp/B01J7N3RE6) connected to the STM32's SWD (***S**erial **W**ire **D**ebug*) port and a serial text terminal by an [FTDI breakout board](https://smile.amazon.com/HiLetgo-FT232RL-Converter-Adapter-Breakout/dp/B00IJXZQ7C) connected to `UART1` on the STM32.
+
 ### Relevant Peripherals
 
-- [Ozzymaker BerryIMU](http://ozzmaker.com/product/berryimu-accelerometer-gyroscope-magnetometer-barometricaltitude-sensor)
+- [Ozzymaker BerryIMU](http://ozzmaker.com/product/berryimu-accelerometer-gyroscope-magnetometer-barometricaltitude-sensor) via I<sup>2</sup>C
 - [SD Card breakout board](https://smile.amazon.com/SenMod-Adapter-Reader-Module-Arduino/dp/B01JYNEX56) via SPI
 - [3v3 to 5v signal converter](https://smile.amazon.com/Logic-Converter-Bi-Directional-Module-Arduino/dp/B014MC1OAG)
 
