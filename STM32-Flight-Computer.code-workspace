@@ -50,6 +50,18 @@
 			"streambuf": "cpp",
 			"cinttypes": "cpp",
 			"typeinfo": "cpp"
-		}
+		},
+		"cSpell.words": [
+			"ESCs",
+			"Ozzymaker",
+			"STSTM",
+			"gitattributes",
+			"gitignore",
+			"ldscripts",
+			"platformio",
+			"println",
+			"strikethrough",
+			"struct"
+		]
 	}
 }
