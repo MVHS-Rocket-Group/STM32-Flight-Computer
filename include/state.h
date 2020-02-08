@@ -5,17 +5,20 @@
 #include <helpers.h>          // Helper objects
 #include <array>
 #include <vector>
+#include <cmath>
 
-enum FlightState { ON_PAD, LAUNCHED, IN_FREEFALL, LANDED};
+enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, LAUNCHED, IN_FREEFALL, LANDED};
 // https://stackoverflow.com/a/5094430/3339274
 inline String FlightState_to_string(FlightState state) {
-    switch (state) {
-        case ON_PAD:      return "ON_PAD";
-        case LAUNCHED:    return "LAUNCHED";
-        case IN_FREEFALL: return "IN_FREEFALL";
-        case LANDED:      return "LANDED";
-        default:          return "[Unknown FlightState type]";
-    }
+  switch (state) {
+    case DISARMED:        return "DISARMED";
+    case CALIBRATING_ESC: return "CALIBRATING_ESC";
+    case ARMED:           return "ARMED";
+    case LAUNCHED:        return "LAUNCHED";
+    case IN_FREEFALL:     return "IN_FREEFALL";
+    case LANDED:          return "LANDED";
+    default:              return "[Unknown FlightState type]";
+  }
 }
 
 struct State {
@@ -58,6 +61,21 @@ struct State {
            "gyro_y_raw, gyro_z_raw, mag_x_raw, mag_y_raw, mag_z_raw, press_raw, "
            "temp_raw, acc_x_f, acc_y_f, acc_z_f, gyro_x_f, gyro_y_f, gyro_z_f, "
            "mag_x_f, mag_y_f, mag_z_f, press_f, temp_f, events";
+  }
+
+  double acc_magnitude(bool filtered) {
+    if(filtered) return sqrt(pow(_acc_f[0], 2) + pow(_acc_f[1], 2) + pow(_acc_f[2], 2));
+    else return sqrt(pow(_acc_raw[0], 2) + pow(_acc_raw[1], 2) + pow(_acc_raw[2], 2));
+  }
+
+  double gyro_magnitude(bool filtered) {
+    if(filtered) return sqrt(pow(_gyro_f[0], 2) + pow(_gyro_f[1], 2) + pow(_gyro_f[2], 2));
+    else return sqrt(pow(_gyro_raw[0], 2) + pow(_gyro_raw[1], 2) + pow(_gyro_raw[2], 2));
+  }
+
+  double mag_magnitude(bool filtered) {
+    if(filtered) return sqrt(pow(_mag_f[0], 2) + pow(_mag_f[1], 2) + pow(_mag_f[2], 2));
+    else return sqrt(pow(_mag_raw[0], 2) + pow(_mag_raw[1], 2) + pow(_mag_raw[2], 2));
   }
 
   String format_log_line() {

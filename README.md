@@ -2,6 +2,8 @@
 
 ![Travis-CI Build Status](https://travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer.svg?branch=master)
 
+Travis CI Dashboard: [travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer](https://travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer)
+
 ## Repository Structure
 
 - `.pio/*`: PlatformIO config files and build directory. (*Generated upon execution of  first build*)
