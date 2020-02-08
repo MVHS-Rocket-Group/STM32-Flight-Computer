@@ -18,3 +18,4 @@
 - Implement usage of `FlightState` in `void loop()`
 - Implement event tracking, add as detected to state vector
 - Verify that pin assignments in `constants.h` match reality
+- ~~Configure TravisCI~~

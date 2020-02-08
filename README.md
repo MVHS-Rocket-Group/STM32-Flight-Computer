@@ -1,5 +1,7 @@
 # STM32-Flight-Computer
 
+![Travis-CI Build Status](https://travis-ci.com/MVHS-Rocket-Group/STM32-Flight-Computer.svg?branch=master))
+
 ## Repository Structure
 
 - `.pio/*`: PlatformIO config files and build directory. (*Generated upon execution of  first build*)
@@ -14,7 +16,7 @@
 - `src/*`: C/C++ source code files.
   - `main.cpp`: Primary entry point for program.
 - `.gitattributes`, `.gitignore`: Git SCM config files.
-- `travis.yml`: Travis CI (*continuous integration*) automated build checker config. (***TODO: Implement!***)
+- `travis.yml`: Travis CI (*continuous integration*) automated build checker config.
 - `platformio.ini`: PlatformIO build config.
 - `STM32-Flight-Computer.code-workspace`: VSCode workspace file.
 - `TODO.md`: TODO list for project.
