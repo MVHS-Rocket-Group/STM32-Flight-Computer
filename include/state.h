@@ -7,17 +7,19 @@
 #include <vector>
 #include <cmath>
 
-enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, LAUNCHED, IN_FREEFALL, LANDED};
+enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, POWERED_ASSENT,
+                  BALLISTIC_TRAJECTORY, CHUTE_DEPLOYED, LANDED};
 // https://stackoverflow.com/a/5094430/3339274
-inline String FlightState_to_string(FlightState state) {
+inline String FlightState_text(FlightState state) {
   switch (state) {
-    case DISARMED:        return "DISARMED";
-    case CALIBRATING_ESC: return "CALIBRATING_ESC";
-    case ARMED:           return "ARMED";
-    case LAUNCHED:        return "LAUNCHED";
-    case IN_FREEFALL:     return "IN_FREEFALL";
-    case LANDED:          return "LANDED";
-    default:              return "[Unknown FlightState type]";
+    case DISARMED:              return "DISARMED";
+    case CALIBRATING_ESC:       return "CALIBRATING_ESC";
+    case ARMED:                 return "ARMED";
+    case POWERED_ASSENT:        return "POWERED_ASSENT";
+    case BALLISTIC_TRAJECTORY:  return "BALLISTIC_TRAJECTORY";
+    case CHUTE_DEPLOYED:        return "CHUTE_DEPLOYED";
+    case LANDED:                return "LANDED";
+    default:                    return "[Unknown FlightState type]";
   }
 }
 
@@ -82,11 +84,19 @@ struct State {
     String events_str = "";
     for(String event : _events_list) events_str += event + " ";
 
-    return (String)_time + ", " + FlightState_to_string(_flight_state) + ", " +
+    return (String)_time + ", " + FlightState_text(_flight_state) + ", " +
+
            (String)_acc_raw[0] + ", " + (String)_acc_raw[1] + ", " + (String)_acc_raw[2] + ", " +
            (String)_gyro_raw[0] + ", " + (String)_gyro_raw[1] + ", " + (String)_gyro_raw[2] + ", " +
            (String)_mag_raw[0] + ", " + (String)_mag_raw[1] + ", " + (String)_mag_raw[2] + ", " +
-           (String)_press_raw + ", " + (String)_temp_raw + ", " + events_str;
+           (String)_press_raw + ", " + (String)_temp_raw + ", " +
+
+           (String)_acc_f[0] + ", " + (String)_acc_f[1] + ", " + (String)_acc_f[2] + ", " +
+           (String)_gyro_f[0] + ", " + (String)_gyro_f[1] + ", " + (String)_gyro_f[2] + ", " +
+           (String)_mag_f[0] + ", " + (String)_mag_f[1] + ", " + (String)_mag_f[2] + ", " +
+           (String)_press_f + ", " + (String)_temp_f + ", " +
+           
+           events_str;
   }
 };
 

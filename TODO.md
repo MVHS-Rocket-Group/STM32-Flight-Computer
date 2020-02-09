@@ -4,19 +4,28 @@
 
 - Flight controller (*PWM Output*)
 - ~~Flight state data logger~~
-  - [IMU board: Ozzymaker BerryIMU](http://ozzmaker.com/product/berryimu-accelerometer-gyroscope-magnetometer-barometricaltitude-sensor)
   - [LSM9DS1 PIO Library](https://platformio.org/lib/show/6589/Arduino_LSM9DS1)
   - [BMP280 PIO Library](http://platformio.org/lib/show/528/Adafruit%20BMP280%20Library)
   - [SD PIO Library](http://platformio.org/lib/show/868/SD)
-- Important flight events: e.g. Launch detection, arming of different systems, control loop decisions, deployments (detected via accelerometer edges?)
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
-- Arming switch toggle (*use software interrupt*)
+- Detect arming switch toggle with pin-change interrupt
   - Move ESC calibration to `void loop()`, only execute once armed
+  - Trigger transition from `DISARMED` to `CALIBRATING_ESC`
 - ~~Implement `CALIBRATING` and `DISARMED` states in `FlightState` enum type~~
   - ~~Rename `ON_PAD` state to `ARMED`~~
-- Implement usage of `FlightState` in `void loop()`
+- Implement `FlightState`-based control loop in `void loop()` with `switch()` block
+  - Add goal items to the state vector
+    - Duty cycle goal for fan pods is only != MIN_COMMAND when in `POWERED_ASSENT`and `BALLISTIC_TRAJECTORY` states
+  - Save timestamp for each state transition into a global variable
+  - `DISARMED` --> `CALIBRATING_ESC`: when arming switch triggered (LOW --> HIGH)
+  - `CALIBRATING_ESC` --> `ARMED`: when 3-second ESC calibration is complete
+  - `ARMED` --> `POWERED_ASSENT`: when IMU sees >2g's of vertical acceleration
+  - `POWERED_ASSENT` --> `BALLISTIC_TRAJECTORY`: when IMU sees <2g's of vertical acceleration
+  - `BALLISTIC TRAJECTORY` --> `CHUTE_DEPLOYED`: when IMU sees violent jerk of deployment mech
+  - `CHUTE_DEPLOYED` --> `LANDED`: when IMU sees violent jerk of landing
 - Implement event tracking, add as detected to state vector
+  - Decide what events are worth noting down
 - Verify that pin assignments in `constants.h` match reality
 - ~~Configure TravisCI~~
 - Implement RGB status LED control
