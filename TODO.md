@@ -25,4 +25,4 @@
   - Decide what events are worth noting down
 - Verify that pin assignments in `constants.h` match reality
 - ~~Configure TravisCI~~
-- Implement RGB status LED control
+- Implement RGB status LED control (*see: https://learn.adafruit.com/adafruit-arduino-lesson-3-rgb-leds/arduino-sketch*)
