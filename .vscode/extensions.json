@@ -2,6 +2,18 @@
 	// See http://go.microsoft.com/fwlink/?LinkId=827846
 	// for the documentation about the extensions.json format
 	"recommendations": [
-		"platformio.platformio-ide"
+		"platformio.platformio-ide",
+		"hookyqr.beautify",
+		"ms-vscode.cpptools",
+		"streetsidesoftware.code-spell-checker",
+		"eamodio.gitlens",
+		"zixuanwang.linkerscript",
+		"davidanson.vscode-markdownlint",
+		"christian-kohler.path-intellisense",
+		"vscodevim.vim",
+		"vscode-icons-team.vscode-icons",
+		"ms-vsliveshare.vsliveshare-pack",
+		"geddski.macros",
+		"ms-vscode-remote.vscode-remote-extensionpack"
 	]
 }

@@ -4,9 +4,6 @@
 
 - Flight controller (*PWM Output*)
 - ~~Flight state data logger~~
-  - [LSM9DS1 PIO Library](https://platformio.org/lib/show/6589/Arduino_LSM9DS1)
-  - [BMP280 PIO Library](http://platformio.org/lib/show/528/Adafruit%20BMP280%20Library)
-  - [SD PIO Library](http://platformio.org/lib/show/868/SD)
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
 - Detect arming switch toggle with pin-change interrupt
