@@ -2,12 +2,13 @@
 #define HELPERS_H
 #include <Arduino.h>
 #include <Wire.h>
-#include <constants.h>        // Constants
-#include <state.h>            // State class
+#include <constants.h>  // Constants
+#include <state.h>      // State class
 #include <array>
 
-// Searches for devices at all available addresses on the I2C bus and prints results.
-// Common address associations: https://cdn-learn.adafruit.com/downloads/pdf/i2c-addresses.pdf
+// Searches for devices at all available addresses on the I2C bus and prints
+// results. Common address associations:
+// https://cdn-learn.adafruit.com/downloads/pdf/i2c-addresses.pdf
 void search_I2C_bus() {
   int count = 0;
   Wire.begin();
@@ -47,9 +48,16 @@ class CodeTimer {
     Serial.print(micros() - _begin);
     Serial.println("µs.");
   }
+
  private:
   unsigned long _begin;
   String _name;
 };
+
+void set_led_color(uint8_t r, uint8_t g, uint8_t b) {
+  analogWrite(LED_R_PIN, map(r, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(LED_G_PIN, map(g, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
+}
 
 #endif

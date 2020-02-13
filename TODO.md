@@ -6,8 +6,9 @@
 - ~~Flight state data logger~~
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
-- Detect arming switch toggle with pin-change interrupt
+- Detect arming switch toggle with pin-change interrupt (*use `INPUT_PULLUP`*)
   - Move ESC calibration to `void loop()`, only execute once armed
+    - Only keep copy of ESC calibration in `void setup()` until functional test with actual ESC is complete
   - Trigger transition from `DISARMED` to `CALIBRATING_ESC`
 - ~~Implement `CALIBRATING` and `DISARMED` states in `FlightState` enum type~~
   - ~~Rename `ON_PAD` state to `ARMED`~~
@@ -25,4 +26,6 @@
   - Decide what events are worth noting down
 - Verify that pin assignments in `constants.h` match reality
 - ~~Configure TravisCI~~
-- Implement RGB status LED control (*see: https://learn.adafruit.com/adafruit-arduino-lesson-3-rgb-leds/arduino-sketch*)
+- Implement RGB status LED control
+  - Constants for pin assignments and colors already exist in `constants.h`
+  - Helper function to write color to LED already implemented
