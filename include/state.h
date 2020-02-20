@@ -10,7 +10,7 @@
 enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, POWERED_ASSENT,
                   BALLISTIC_TRAJECTORY, CHUTE_DEPLOYED, LANDED};
 // https://stackoverflow.com/a/5094430/3339274
-inline String FlightState_text(FlightState& state) {
+inline String FlightState_text(FlightState state) {
   switch (state) {
     case DISARMED:              return "DISARMED";
     case CALIBRATING_ESC:       return "CALIBRATING_ESC";
@@ -55,7 +55,8 @@ struct State {
     _time = millis() / 1000.0;
   }
 
-  void add_event(String event) { _events_list.push_back(event); }
+  // https://stackoverflow.com/a/117458/3339274
+  void add_event(const String& event) { _events_list.push_back(event); }
 
   static String header_line() {
     // https://stackoverflow.com/a/3859167/3339274
@@ -65,22 +66,22 @@ struct State {
            "mag_x_f, mag_y_f, mag_z_f, press_f, temp_f, events";
   }
 
-  double acc_magnitude(bool filtered) {
+  double acc_magnitude(bool filtered) const {
     if(filtered) return sqrt(pow(_acc_f[0], 2) + pow(_acc_f[1], 2) + pow(_acc_f[2], 2));
     else return sqrt(pow(_acc_raw[0], 2) + pow(_acc_raw[1], 2) + pow(_acc_raw[2], 2));
   }
 
-  double gyro_magnitude(bool filtered) {
+  double gyro_magnitude(bool filtered) const {
     if(filtered) return sqrt(pow(_gyro_f[0], 2) + pow(_gyro_f[1], 2) + pow(_gyro_f[2], 2));
     else return sqrt(pow(_gyro_raw[0], 2) + pow(_gyro_raw[1], 2) + pow(_gyro_raw[2], 2));
   }
 
-  double mag_magnitude(bool filtered) {
+  double mag_magnitude(bool filtered) const {
     if(filtered) return sqrt(pow(_mag_f[0], 2) + pow(_mag_f[1], 2) + pow(_mag_f[2], 2));
     else return sqrt(pow(_mag_raw[0], 2) + pow(_mag_raw[1], 2) + pow(_mag_raw[2], 2));
   }
 
-  String format_log_line() {
+  String format_log_line() const {
     String events_str = "";
     for(String event : _events_list) events_str += event + " ";
 
