@@ -26,7 +26,7 @@ void setup() {
   pinMode(PWM_POD1_PIN, OUTPUT);
   pinMode(PWM_POD2_PIN, OUTPUT);
   pinMode(ARM_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(LED_R_PIN, OUTPUT);
+  pinMode(EXP_LED_R_PIN, OUTPUT);
   pinMode(LED_G_PIN, OUTPUT);
   pinMode(LED_B_PIN, OUTPUT);
 

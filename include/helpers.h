@@ -54,10 +54,18 @@ class CodeTimer {
   String _name;
 };
 
-void set_led_color(uint8_t r, uint8_t g, uint8_t b) {
-  analogWrite(LED_R_PIN, map(r, 0, 255, 0, PWM_RESOLUTION));
-  analogWrite(LED_G_PIN, map(g, 0, 255, 0, PWM_RESOLUTION));
-  analogWrite(LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
+// Set EXPeriment package status LED.
+void set_exp_led_color(uint8_t r, uint8_t g, uint8_t b) {
+  analogWrite(EXP_LED_R_PIN, map(r, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(EXP_LED_G_PIN, map(g, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(EXP_LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
+}
+
+// Set EXTernal status LED.
+void set_ext_led_color(uint8_t r, uint8_t g, uint8_t b) {
+  analogWrite(EXT_LED_R_PIN, map(r, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(EXT_LED_G_PIN, map(g, 0, 255, 0, PWM_RESOLUTION));
+  analogWrite(EXT_LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
 }
 
 #endif
