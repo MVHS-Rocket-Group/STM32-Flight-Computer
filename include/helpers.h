@@ -37,8 +37,7 @@ inline void logErr(String msg) { Serial.println("Error: " + msg); }
 
 class CodeTimer {
  public:
-  CodeTimer(String name) {
-    _name = name;
+  CodeTimer(String name) : _name(name) {
     Serial.println("Begin execution of \"" + _name + "\" code.");
     _begin = micros();
   }
