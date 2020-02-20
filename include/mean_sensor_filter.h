@@ -49,18 +49,19 @@ class MeanSensorFilter {
 
     // Fill temporary objects with a sum of all data points in the buffer.
     for(uint16_t i = 0; i < current_buffer_size; i++) {
-      for(uint8_t j = 0; j < 3; j++) acc_temp[j] += _acc_history[i][j];
-      for(uint8_t j = 0; j < 3; j++) gyro_temp[j] += _gyro_history[i][j];
-      for(uint8_t j = 0; j < 3; j++) mag_temp[j] += _mag_history[i][j];
+      acc_temp += _acc_history[i];
+      gyro_temp += _gyro_history[i];
+      mag_temp += _mag_history[i];
 
       press_temp += _press_history[i];
       temp_temp += _temp_history[i];
     }
 
     // Convert totals to averages...
-    for(uint8_t j = 0; j < 3; j++) acc_temp[j] = acc_temp[j] / current_buffer_size;
-    for(uint8_t j = 0; j < 3; j++) gyro_temp[j] = gyro_temp[j] / current_buffer_size;
-    for(uint8_t j = 0; j < 3; j++) mag_temp[j] = mag_temp[j] / current_buffer_size;
+    acc_temp /= (double)current_buffer_size;
+    gyro_temp /= (double)current_buffer_size;
+    mag_temp /= (double)current_buffer_size;
+
     press_temp = press_temp / current_buffer_size;
     temp_temp = temp_temp / current_buffer_size;
 

@@ -10,7 +10,7 @@
 enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, POWERED_ASSENT,
                   BALLISTIC_TRAJECTORY, CHUTE_DEPLOYED, LANDED};
 // https://stackoverflow.com/a/5094430/3339274
-inline String FlightState_text(FlightState state) {
+inline String FlightState_text(FlightState& state) {
   switch (state) {
     case DISARMED:              return "DISARMED";
     case CALIBRATING_ESC:       return "CALIBRATING_ESC";
@@ -45,10 +45,10 @@ struct State {
 
   // Auto-populate fields from sensors.
   // TODO: Implement FlightState!
-  State(std::array<double, 3> acc_raw, std::array<double, 3> gyro_raw,
-        std::array<double, 3> mag_raw, double press_raw, double temp_raw,
-        std::array<double, 3> acc_f, std::array<double, 3> gyro_f,
-        std::array<double, 3> mag_f, double press_f, double temp_f) :
+  State(std::array<double, 3>& acc_raw, std::array<double, 3>& gyro_raw,
+        std::array<double, 3>& mag_raw, double press_raw, double temp_raw,
+        std::array<double, 3>& acc_f, std::array<double, 3>& gyro_f,
+        std::array<double, 3>& mag_f, double press_f, double temp_f) :
           _acc_raw(acc_raw), _gyro_raw(gyro_raw), _mag_raw(mag_raw),
           _press_raw(press_raw), _temp_raw(temp_raw), _acc_f(acc_f),
           _gyro_f(gyro_f), _mag_f(mag_f), _press_f(press_f), _temp_f(temp_f) {
@@ -84,18 +84,22 @@ struct State {
     String events_str = "";
     for(String event : _events_list) events_str += event + " ";
 
+    // First cast to String type is required to start off the expression with
+    // a String type to concatonate onto. This is because it is illegal in C++
+    // to define an addition operator involving two non-"user-defined" types,
+    // e.g. double and const char[3] like in the case below.
     return (String)_time + ", " + FlightState_text(_flight_state) + ", " +
 
-           (String)_acc_raw[0] + ", " + (String)_acc_raw[1] + ", " + (String)_acc_raw[2] + ", " +
-           (String)_gyro_raw[0] + ", " + (String)_gyro_raw[1] + ", " + (String)_gyro_raw[2] + ", " +
-           (String)_mag_raw[0] + ", " + (String)_mag_raw[1] + ", " + (String)_mag_raw[2] + ", " +
-           (String)_press_raw + ", " + (String)_temp_raw + ", " +
+           _acc_raw[0] + ", " + _acc_raw[1] + ", " + _acc_raw[2] + ", " +
+           _gyro_raw[0] + ", " + _gyro_raw[1] + ", " + _gyro_raw[2] + ", " +
+           _mag_raw[0] + ", " + _mag_raw[1] + ", " + _mag_raw[2] + ", " +
+           _press_raw + ", " + _temp_raw + ", " +
 
-           (String)_acc_f[0] + ", " + (String)_acc_f[1] + ", " + (String)_acc_f[2] + ", " +
-           (String)_gyro_f[0] + ", " + (String)_gyro_f[1] + ", " + (String)_gyro_f[2] + ", " +
-           (String)_mag_f[0] + ", " + (String)_mag_f[1] + ", " + (String)_mag_f[2] + ", " +
-           (String)_press_f + ", " + (String)_temp_f + ", " +
-           
+           _acc_f[0] + ", " + _acc_f[1] + ", " + _acc_f[2] + ", " +
+           _gyro_f[0] + ", " + _gyro_f[1] + ", " + _gyro_f[2] + ", " +
+           _mag_f[0] + ", " + _mag_f[1] + ", " + _mag_f[2] + ", " +
+           _press_f + ", " + _temp_f + ", " +
+
            events_str;
   }
 };

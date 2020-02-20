@@ -67,4 +67,31 @@ void set_ext_led_color(uint8_t r, uint8_t g, uint8_t b) {
   analogWrite(EXT_LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
 }
 
+// Define overloads to the /= and += operators for std::array to help with
+// vector arithmentic.
+
+// https://stackoverflow.com/a/3595874/3339274
+template <typename T, std::size_t SIZE>
+std::array<T, SIZE>& operator/=(std::array<T, SIZE>& dividend,
+                                const T& divisor) {
+  for (unsigned int i = 0; i < dividend.size(); i++) dividend[i] /= divisor;
+  return dividend;
+}
+
+// https://stackoverflow.com/a/3595874/3339274
+template <typename T, std::size_t SIZE>
+std::array<T, SIZE>& operator+=(std::array<T, SIZE>& arr1,
+                                std::array<T, SIZE>& arr2) {
+  for (unsigned int i = 0; i < arr1.size(); i++) arr1[i] += arr2[i];
+  return arr1;
+}
+
+// Define overload to the + operator between types and String objects.
+
+// https://stackoverflow.com/a/34106613/3339274
+template <typename T>
+String& operator+(String& str, T& item) { return str + (String)item; }
+template <typename T>
+String& operator+(T& item, String& str) { return (String)item + str; }
+
 #endif

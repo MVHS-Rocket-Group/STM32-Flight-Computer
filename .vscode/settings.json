@@ -1,2 +1,20 @@
 {
+  "cSpell.words": [
+    "ESCs",
+    "FTDI",
+    "Ozzymaker",
+    "STSTM",
+    "UART",
+    "adafruit",
+    "ebug",
+    "erial",
+    "gitattributes",
+    "gitignore",
+    "ldscripts",
+    "platformio",
+    "println",
+    "stackoverflow",
+    "strikethrough",
+    "struct"
+  ]
 }
