@@ -27,8 +27,11 @@ void setup() {
   pinMode(PWM_POD2_PIN, OUTPUT);
   pinMode(ARM_SWITCH_PIN, INPUT_PULLUP);
   pinMode(EXP_LED_R_PIN, OUTPUT);
-  pinMode(LED_G_PIN, OUTPUT);
-  pinMode(LED_B_PIN, OUTPUT);
+  pinMode(EXP_LED_G_PIN, OUTPUT);
+  pinMode(EXP_LED_B_PIN, OUTPUT);
+  pinMode(EXT_LED_R_PIN, OUTPUT);
+  pinMode(EXT_LED_G_PIN, OUTPUT);
+  pinMode(EXT_LED_B_PIN, OUTPUT);
 
   // Wait for 5 seconds to allow for terminal connection.
   for (uint8_t i = 0; i < 5; i++) {
