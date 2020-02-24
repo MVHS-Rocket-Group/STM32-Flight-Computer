@@ -24,8 +24,8 @@
   - `CHUTE_DEPLOYED` --> `LANDED`: when IMU sees violent jerk of landing
 - Implement event tracking, add as detected to state vector
   - Decide what events are worth noting down
-- Verify that pin assignments in `constants.h` match reality
+- ~~Verify that pin assignments in `constants.h` match reality~~
 - ~~Configure TravisCI~~
 - Implement RGB status LED control
-  - Constants for pin assignments and colors already exist in `constants.h`
-  - Helper function to write color to LED already implemented
+  - ~~Constants for pin assignments and colors already exist in `constants.h`~~
+  - ~~Helper function to write color to LED already implemented~~
