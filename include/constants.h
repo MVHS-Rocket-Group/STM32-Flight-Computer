@@ -5,20 +5,19 @@
 #define SERIAL_TERM_BAUD 115200
 #define DEBUG_MODE true
 
-// TODO: Fix these to be correct!
 #define ARM_SWITCH_PIN PA0
-#define PWM_POD1_PIN PA1
-#define PWM_POD2_PIN PA2
+#define PWM_POD1_PIN PB3
+#define PWM_POD2_PIN PB4
 
 // EXPeriment package status LED.
-#define EXP_LED_R_PIN PA3
-#define EXP_LED_G_PIN PA4
-#define EXP_LED_B_PIN PA5
+#define EXP_LED_R_PIN PB14
+#define EXP_LED_G_PIN PB13
+#define EXP_LED_B_PIN PB12
 
 // EXTernal status LED.
-#define EXT_LED_R_PIN PA6
-#define EXT_LED_G_PIN PA7
-#define EXT_LED_B_PIN PA8
+#define EXT_LED_R_PIN PA1
+#define EXT_LED_G_PIN PA2
+#define EXT_LED_B_PIN PA3
 
 #define PWM_WRITE_RES 65535  // Change from default 8-bits to 16-bits
 
