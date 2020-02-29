@@ -24,7 +24,7 @@ void setup() {
   Serial.begin(SERIAL_TERM_BAUD);
   while (!Serial) delayMicroseconds(1);
 
-  {  // I/O pins setup
+  {  // I/O pins setup.
     analogWriteResolution(PWM_WRITE_RES);
     analogWriteFrequency(PWM_FREQ);
     pinMode(PWM_POD1_PIN, OUTPUT);
@@ -45,10 +45,10 @@ void setup() {
   }
   Serial.println();
 
-  // For debug purposes only... lists all available I2C devices.
+  // Lists all available I2C devices for debug purposes.
   detect_I2C_devices();
 
-  {  // I2C sensor init...
+  {  // I2C sensor init.
     logMsg("Begin: initializing IMU...");
     if (!IMU.begin()) {
       logErr("Failed IMU initialization!");
@@ -68,14 +68,14 @@ void setup() {
       logMsg("End: initializing BMP280.");
   }
 
-  // Set default settings for BMP280 from datasheet.
+  // Set default settings for BMP280. (from datasheet)
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
                   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
-  {  // SPI SD card init...
+  {  // SPI SD card init.
     logMsg("Begin: SD card init...");
     if (!SD.begin(SD_CS_PIN)) {
       logErr("SD Card failed, or not present");
@@ -86,7 +86,7 @@ void setup() {
     logMsg("End: SD card init.");
   }
 
-  {  // Log file init...
+  {  // Log file init.
     // Find out what the latest log file is, and use the next one
     int num = 0;
     while (logFile == "") {
