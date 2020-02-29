@@ -21,7 +21,7 @@ void setup() {
   // Begin serial connection.
   Serial.begin(SERIAL_TERM_BAUD);
   while (!Serial)
-    ;
+    delayMicroseconds(1);
 
   analogWriteResolution(PWM_WRITE_RES);
   analogWriteFrequency(PWM_FREQ);
@@ -49,16 +49,20 @@ void setup() {
     logMsg("Begin: initializing IMU...");
     if (!IMU.begin()) {
       logErr("Failed IMU initialization!");
+      // Set error code on external LED.
+      set_ext_led_color(RGB_YELLOW);
       while (1)
-        ;
+        delayMicroseconds(1);
     } else
       logMsg("End: initializing IMU.");
 
     logMsg("Begin: initializing BMP280...");
     if (!bmp.begin()) {
       logErr("Failed BMP280 initialization!");
+      // Set error code on external LED.
+      set_ext_led_color(RGB_YELLOW);
       while (1)
-        ;
+        delayMicroseconds(1);
     } else
       logMsg("End: initializing BMP280.");
   }
@@ -74,8 +78,10 @@ void setup() {
     logMsg("Begin: SD card init...");
     if (!SD.begin(SD_CS_PIN)) {
       logErr("SD Card failed, or not present");
+      // Set error code on external LED.
+      set_ext_led_color(RGB_YELLOW);
       while (1)
-        ;
+        delayMicroseconds(1);
     }
     logMsg("End: SD card init.");
   }
@@ -132,6 +138,9 @@ void loop() {
   filter.add_data(&current_timestep);
   filter.calculate_filter(&current_timestep);
 
+  // Set default color for external LED in state vector.
+  current_timestep._external_led = {0, 0, 0};
+
   // Flight control loop.
   switch (previous_timestep._next_flight_state) {
     case DISARMED:
@@ -148,10 +157,16 @@ void loop() {
       delay(3000);
       logMsg("END: ESC MIN_COMMAND calibration.");
 
+      set_ext_led_color(RGB_RED);
+      current_timestep._external_led = {RGB_RED};
+
       current_timestep._next_flight_state = ARMED;
       break;
 
     case ARMED:
+      set_ext_led_color(RGB_RED);
+      current_timestep._external_led = {RGB_RED};
+
       // TODO: Is the IMU y-axis vertical to the rocket?
       // Move to POWERED_ASSENT when IMU sees >2g's of vertical acceleration.
       if (current_timestep._acc_f[1] > 9.81 * 2) {
@@ -163,6 +178,9 @@ void loop() {
       // TODO: Do we want full power on the motors?
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
+
+      set_ext_led_color(RGB_GREEN);
+      current_timestep._external_led = {RGB_GREEN};
 
       // TODO: Is the IMU y-axis vertical to the rocket?
       // Move to BALLISTIC_TRAJECTORY when IMU sees <2g's of vertical
@@ -177,6 +195,9 @@ void loop() {
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
 
+      set_ext_led_color(RGB_GREEN);
+      current_timestep._external_led = {RGB_GREEN};
+
       // TODO: Is this a good trigger point?
       // Move to CHUTE_DEPLOYED when IMU sees a violent jerk from chute release.
       if (current_timestep.acc_magnitude(false) > 9.81 * 2) {
@@ -188,6 +209,9 @@ void loop() {
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
 
+      set_ext_led_color(RGB_RED);
+      current_timestep._external_led = {RGB_RED};
+
       // TODO: Is this a good trigger point?
       // Move to LANDED when IMU sees a violent jerk from landing.
       if (current_timestep.acc_magnitude(false) > 9.81 * 2) {
@@ -197,11 +221,29 @@ void loop() {
 
     case LANDED:
       // Dummy case, sit here and wait for rocket to be retrieved.
+      set_ext_led_color(RGB_RED);
+      current_timestep._external_led = {RGB_RED};
       break;
 
     default:
       logErr("Unknown FlightState type detected!");
       break;
+  }
+
+  // TODO: Is the IMU y-axis vertical to the rocket?
+  // Experiment LED controller.
+  if(within(current_timestep._acc_f[1], 9.81, 0.10)) {
+    set_exp_led_color(RGB_RED);
+    current_timestep._experiment_led = {RGB_RED};
+  } else if(within(current_timestep._acc_f[1], 0, 0.10)) {
+    set_exp_led_color(RGB_GREEN);
+    current_timestep._experiment_led = {RGB_GREEN};
+  } else if(current_timestep._acc_f[1] < 0.0) {
+    set_exp_led_color(RGB_BLUE);
+    current_timestep._experiment_led = {RGB_BLUE};
+  } else {
+    set_exp_led_color(RGB_YELLOW);
+    current_timestep._experiment_led = {RGB_YELLOW};
   }
 
   {  // Write state info to SD file, log to serial

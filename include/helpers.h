@@ -66,6 +66,12 @@ void set_ext_led_color(uint8_t r, uint8_t g, uint8_t b) {
   analogWrite(EXT_LED_B_PIN, map(b, 0, 255, 0, PWM_RESOLUTION));
 }
 
+// Returns whether or not value is within +/- range of assertion. Range should
+// be positive.
+bool within(double value, double assertion, double range) {
+  return std::abs(value - assertion) < range;
+}
+
 // Define overloads to the /= and += operators for std::array to help with
 // vector arithmentic.
 
@@ -89,8 +95,12 @@ std::array<T, SIZE>& operator+=(std::array<T, SIZE>& arr1,
 
 // https://stackoverflow.com/a/34106613/3339274
 template <typename T>
-String& operator+(String& str, T& item) { return str + (String)item; }
+String& operator+(String& str, T& item) {
+  return str + (String)item;
+}
 template <typename T>
-String& operator+(T& item, String& str) { return (String)item + str; }
+String& operator+(T& item, String& str) {
+  return (String)item + str;
+}
 
 #endif

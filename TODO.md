@@ -23,15 +23,15 @@
   - Decide what events are worth noting down
 - ~~Verify that pin assignments in `constants.h` match reality~~
 - ~~Configure TravisCI~~
-- Implement RGB status LED control
-  - Add debug color for error code to EXTernal LED (*activated in `setup()` if I/O not initialized properly*)
-  - EXPeriment codes:
-    - RED when >1g
-    - GREEN when witihin +/- .1g
-    - BLUE when negative <0g
-  - EXTernal codes:
-    - RED when EXC calibration complete,
-    - GREEN when fans turned on
-    - RED when fans off
-  - ~~Constants for pin assignments and colors already exist in `constants.h`~~
-  - ~~Helper function to write color to LED already implemented~~
+- ~~Implement RGB status LED control~~
+  - ~~Add debug color for error code to EXTernal LED (*activated in `setup()` if I/O not initialized properly*)~~
+  - ~~EXPeriment codes~~
+    - ~~RED when >1g~~
+    - ~~GREEN when within +/- .1g~~
+    - ~~BLUE when negative <0g~~
+  - ~~EXTernal codes~~
+    - ~~RED when EXC calibration complete~~
+    - ~~GREEN when fans turned on~~
+    - ~~RED when fans off~~
+  - ~~Create constants for pin assignments and colors in `constants.h`~~
+  - ~~Implement helper function to write color to LED already~~
