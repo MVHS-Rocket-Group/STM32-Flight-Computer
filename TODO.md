@@ -4,6 +4,7 @@
 
 - ~~Flight controller (*PWM Output*)~~
 - ~~Flight state data logger~~
+- Clear `// TODO:` annotations in `main.cpp` after discussion
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
 - ~~Implement `CALIBRATING` and `DISARMED` states in `FlightState` enum type~~
