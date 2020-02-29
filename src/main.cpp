@@ -17,23 +17,26 @@ String logFile = "";  // Path on SD card to current log file.
 MeanSensorFilter filter(25);
 State previous_timestep;
 
+unsigned int esc_calibration_begin;
+
 void setup() {
   // Begin serial connection.
   Serial.begin(SERIAL_TERM_BAUD);
-  while (!Serial)
-    delayMicroseconds(1);
+  while (!Serial) delayMicroseconds(1);
 
-  analogWriteResolution(PWM_WRITE_RES);
-  analogWriteFrequency(PWM_FREQ);
-  pinMode(PWM_POD1_PIN, OUTPUT);
-  pinMode(PWM_POD2_PIN, OUTPUT);
-  pinMode(ARM_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(EXP_LED_R_PIN, OUTPUT);
-  pinMode(EXP_LED_G_PIN, OUTPUT);
-  pinMode(EXP_LED_B_PIN, OUTPUT);
-  pinMode(EXT_LED_R_PIN, OUTPUT);
-  pinMode(EXT_LED_G_PIN, OUTPUT);
-  pinMode(EXT_LED_B_PIN, OUTPUT);
+  {  // I/O pins setup
+    analogWriteResolution(PWM_WRITE_RES);
+    analogWriteFrequency(PWM_FREQ);
+    pinMode(PWM_POD1_PIN, OUTPUT);
+    pinMode(PWM_POD2_PIN, OUTPUT);
+    pinMode(ARM_SWITCH_PIN, INPUT_PULLUP);
+    pinMode(EXP_LED_R_PIN, OUTPUT);
+    pinMode(EXP_LED_G_PIN, OUTPUT);
+    pinMode(EXP_LED_B_PIN, OUTPUT);
+    pinMode(EXT_LED_R_PIN, OUTPUT);
+    pinMode(EXT_LED_G_PIN, OUTPUT);
+    pinMode(EXT_LED_B_PIN, OUTPUT);
+  }
 
   // Wait for 5 seconds to allow for terminal connection.
   for (uint8_t i = 0; i < 5; i++) {
@@ -51,8 +54,7 @@ void setup() {
       logErr("Failed IMU initialization!");
       // Set error code on external LED.
       set_ext_led_color(RGB_YELLOW);
-      while (1)
-        delayMicroseconds(1);
+      while (1) delayMicroseconds(1);
     } else
       logMsg("End: initializing IMU.");
 
@@ -61,8 +63,7 @@ void setup() {
       logErr("Failed BMP280 initialization!");
       // Set error code on external LED.
       set_ext_led_color(RGB_YELLOW);
-      while (1)
-        delayMicroseconds(1);
+      while (1) delayMicroseconds(1);
     } else
       logMsg("End: initializing BMP280.");
   }
@@ -80,8 +81,7 @@ void setup() {
       logErr("SD Card failed, or not present");
       // Set error code on external LED.
       set_ext_led_color(RGB_YELLOW);
-      while (1)
-        delayMicroseconds(1);
+      while (1) delayMicroseconds(1);
     }
     logMsg("End: SD card init.");
   }
@@ -151,21 +151,32 @@ void loop() {
       break;
 
     case CALIBRATING_ESC:
-      logMsg("Begin: ESC MIN_COMMAND calibration...");
       // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC
       // self-calibrate.
+      logMsg("Begin: ESC MIN_COMMAND calibration...");
+      esc_calibration_begin = millis();
+
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
-      delay(3000);
-      logMsg("END: ESC MIN_COMMAND calibration.");
+      current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
-      set_ext_led_color(RGB_RED);
-      current_timestep._external_led = {RGB_RED};
+      set_ext_led_color(RGB_BLUE);
+      current_timestep._external_led = {RGB_BLUE};
 
-      current_timestep._next_flight_state = ARMED;
+      // After 3 seconds, the program contunues and jumps to ARMED state.
+      if(millis() - esc_calibration_begin >= 3000) {
+        current_timestep._next_flight_state = ARMED;
+        logMsg("END: ESC MIN_COMMAND calibration.");
+      }
       break;
 
     case ARMED:
+      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+      current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
+
       set_ext_led_color(RGB_RED);
       current_timestep._external_led = {RGB_RED};
 
@@ -180,6 +191,8 @@ void loop() {
       // TODO: Do we want full power on the motors?
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
+      current_timestep._esc_pod_1_pwm = PWM_MAX_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MAX_DUTY;
 
       set_ext_led_color(RGB_GREEN);
       current_timestep._external_led = {RGB_GREEN};
@@ -196,6 +209,8 @@ void loop() {
       // TODO: Do we want full power on the motors?
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
+      current_timestep._esc_pod_1_pwm = PWM_MAX_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MAX_DUTY;
 
       set_ext_led_color(RGB_GREEN);
       current_timestep._external_led = {RGB_GREEN};
@@ -210,6 +225,8 @@ void loop() {
     case CHUTE_DEPLOYED:
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+      current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
       set_ext_led_color(RGB_RED);
       current_timestep._external_led = {RGB_RED};
@@ -223,6 +240,11 @@ void loop() {
 
     case LANDED:
       // Dummy case, sit here and wait for rocket to be retrieved.
+      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+      current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
+
       set_ext_led_color(RGB_RED);
       current_timestep._external_led = {RGB_RED};
       break;
@@ -234,13 +256,13 @@ void loop() {
 
   // TODO: Is the IMU y-axis vertical to the rocket?
   // Experiment LED controller.
-  if(within(current_timestep._acc_f[1], 9.81, 0.10)) {
+  if (within(current_timestep._acc_f[1], 9.81, 0.10)) {
     set_exp_led_color(RGB_RED);
     current_timestep._experiment_led = {RGB_RED};
-  } else if(within(current_timestep._acc_f[1], 0, 0.10)) {
+  } else if (within(current_timestep._acc_f[1], 0, 0.10)) {
     set_exp_led_color(RGB_GREEN);
     current_timestep._experiment_led = {RGB_GREEN};
-  } else if(current_timestep._acc_f[1] < 0.0) {
+  } else if (current_timestep._acc_f[1] < 0.0) {
     set_exp_led_color(RGB_BLUE);
     current_timestep._experiment_led = {RGB_BLUE};
   } else {

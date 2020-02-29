@@ -2,15 +2,15 @@
 
 ~~Strikethrough~~ means an item is complete.
 
-- Flight controller (*PWM Output*)
+- ~~Flight controller (*PWM Output*)~~
 - ~~Flight state data logger~~
 - Camera recorder via “pressing” the record button?
 - Landing buzzer control?
 - ~~Implement `CALIBRATING` and `DISARMED` states in `FlightState` enum type~~
   - ~~Rename `ON_PAD` state to `ARMED`~~
 - Implement `FlightState`-based control loop in `void loop()` with `switch()` block
-  - Add goal items to the state vector
-    - Duty cycle goal for fan pods is only != MIN_COMMAND when in `POWERED_ASSENT`and `BALLISTIC_TRAJECTORY` states
+  - ~~Add goal items to the state vector~~
+    - ~~Duty cycle goal for fan pods is only != MIN_COMMAND when in `POWERED_ASSENT`and `BALLISTIC_TRAJECTORY` states~~
   - Place timeout on spinning motors after `POWERED_ASSENT` activated
   - Save timestamp for each state transition into a global variable
   - ~~`DISARMED` --> `CALIBRATING_ESC`: when arming switch triggered (LOW --> HIGH)~~
