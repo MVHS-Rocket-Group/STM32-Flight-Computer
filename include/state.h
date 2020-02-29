@@ -40,8 +40,8 @@ inline String FlightState_text(FlightState state) {
 struct State {
  public:
   double _time;  // Time since boot (millis)
-  FlightState _current_flight_state;
-  FlightState _next_flight_state;
+  FlightState _current_flight_state;  // Flight state in current timestep
+  FlightState _next_flight_state;     // Calculated flight state
   String _events_list;  // String list of event labels.
 
   // Raw sensor readings
