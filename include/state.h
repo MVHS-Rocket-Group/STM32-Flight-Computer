@@ -4,7 +4,6 @@
 #include <constants.h>        // Constants
 #include <helpers.h>          // Helper objects
 #include <array>
-#include <vector>
 #include <cmath>
 
 enum FlightState {DISARMED, CALIBRATING_ESC, ARMED, POWERED_ASSENT,
@@ -27,7 +26,7 @@ struct State {
  public:
   double _time;                       // Time since boot (millis)
   FlightState _flight_state;
-  std::vector<String> _events_list;    // String list of event labels.
+  String _events_list;    // String list of event labels.
 
   // Raw sensor readings
   std::array<double, 3> _acc_raw;     // Acceleration (m/s^2)
@@ -56,7 +55,7 @@ struct State {
   }
 
   // https://stackoverflow.com/a/117458/3339274
-  void add_event(const String& event) { _events_list.push_back(event); }
+  void add_event(const String& event) { _events_list += event; }
 
   static String header_line() {
     // https://stackoverflow.com/a/3859167/3339274
@@ -82,9 +81,6 @@ struct State {
   }
 
   String format_log_line() const {
-    String events_str = "";
-    for(String event : _events_list) events_str += event + " ";
-
     // First cast to String type is required to start off the expression with
     // a String type to concatonate onto. This is because it is illegal in C++
     // to define an addition operator involving two non-"user-defined" types,
@@ -101,7 +97,7 @@ struct State {
            _mag_f[0] + ", " + _mag_f[1] + ", " + _mag_f[2] + ", " +
            _press_f + ", " + _temp_f + ", " +
 
-           events_str;
+           _events_list;
   }
 };
 

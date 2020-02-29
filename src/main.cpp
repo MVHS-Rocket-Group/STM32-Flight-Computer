@@ -41,7 +41,7 @@ void setup() {
   Serial.println();
 
   // For debug purposes only... lists all available I2C devices.
-  search_I2C_bus();
+  detect_I2C_devices();
 
   {  // I2C sensor init...
     logMsg("Begin: initializing IMU...");

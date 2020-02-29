@@ -6,10 +6,10 @@
 #include <state.h>      // State class
 #include <array>
 
-// Searches for devices at all available addresses on the I2C bus and prints
-// results. Common address associations:
+// Scans for devices at all available addresses on the I2C bus and prints
+// results. Common I2C address associations:
 // https://cdn-learn.adafruit.com/downloads/pdf/i2c-addresses.pdf
-void search_I2C_bus() {
+void detect_I2C_devices() {
   int count = 0;
   Wire.begin();
   Serial.println("Searching for I2C Devices...");
@@ -30,22 +30,21 @@ void search_I2C_bus() {
 }
 
 // Log the debug message only if the DEBUG flag is set
-inline void logMsg(String msg) {
+inline void logMsg(const String& msg) {
   if (DEBUG_MODE) Serial.println("DEBUG: " + msg);
 }
-inline void logErr(String msg) { Serial.println("Error: " + msg); }
+inline void logErr(const String& msg) { Serial.println("Error: " + msg); }
 
 class CodeTimer {
  public:
-  CodeTimer(String name) : _name(name) {
-    Serial.println("Begin execution of \"" + _name + "\" code.");
+  CodeTimer(const String& name) : _name(name) {
+    Serial.println("Begin execution of \"" + _name + "\".");
     _begin = micros();
   }
 
   ~CodeTimer() {
-    Serial.print("\"" + _name + "\" code execution took ");
-    Serial.print(micros() - _begin);
-    Serial.println("µs.");
+    unsigned long duration = micros() - _begin;
+    Serial.println("\"" + _name + "\" execution took " + duration + "µs.");
   }
 
  private:
