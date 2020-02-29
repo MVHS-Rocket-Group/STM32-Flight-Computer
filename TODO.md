@@ -16,9 +16,9 @@
   - ~~`DISARMED` --> `CALIBRATING_ESC`: when arming switch triggered (LOW --> HIGH)~~
   - ~~`CALIBRATING_ESC` --> `ARMED`: when 3-second ESC calibration is complete~~
   - ~~`ARMED` --> `POWERED_ASSENT`: when IMU sees >2g's of vertical acceleration~~
-  - `POWERED_ASSENT` --> `BALLISTIC_TRAJECTORY`: when IMU sees <2g's of vertical acceleration
-  - `BALLISTIC TRAJECTORY` --> `CHUTE_DEPLOYED`: when IMU sees violent jerk of deployment mech
-  - `CHUTE_DEPLOYED` --> `LANDED`: when IMU sees violent jerk of landing
+  - ~~`POWERED_ASSENT` --> `BALLISTIC_TRAJECTORY`: when IMU sees <2g's of vertical acceleration~~
+  - ~~`BALLISTIC TRAJECTORY` --> `CHUTE_DEPLOYED`: when IMU sees violent jerk of deployment mech~~
+  - ~~`CHUTE_DEPLOYED` --> `LANDED`: when IMU sees violent jerk of landing~~
 - Implement event tracking, add as detected to state vector
   - Decide what events are worth noting down
 - ~~Verify that pin assignments in `constants.h` match reality~~

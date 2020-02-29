@@ -15,11 +15,13 @@ Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 String logFile = "";  // Path on SD card to current log file.
 MeanSensorFilter filter(25);
+State previous_timestep;
 
 void setup() {
   // Begin serial connection.
   Serial.begin(SERIAL_TERM_BAUD);
-  while (!Serial);
+  while (!Serial)
+    ;
 
   analogWriteResolution(PWM_WRITE_RES);
   analogWriteFrequency(PWM_FREQ);
@@ -47,24 +49,18 @@ void setup() {
     logMsg("Begin: initializing IMU...");
     if (!IMU.begin()) {
       logErr("Failed IMU initialization!");
-      while (1);
-    } else logMsg("End: initializing IMU.");
+      while (1)
+        ;
+    } else
+      logMsg("End: initializing IMU.");
 
     logMsg("Begin: initializing BMP280...");
     if (!bmp.begin()) {
       logErr("Failed BMP280 initialization!");
-      while (1);
-    } else logMsg("End: initializing BMP280.");
-  }
-
-  {  // ESC PWM init...
-    logMsg("Begin: ESC MIN_COMMAND calibration...");
-    // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC
-    // self-calibrate.
-    analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
-    analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
-    delay(3000);
-    logMsg("END: ESC MIN_COMMAND calibration.");
+      while (1)
+        ;
+    } else
+      logMsg("End: initializing BMP280.");
   }
 
   // Set default settings for BMP280 from datasheet.
@@ -104,6 +100,9 @@ void setup() {
     } else
       logErr("Error opening " + (String)logFile);
   }
+
+  // Initialize first loop iteration with DISARMED State.
+  previous_timestep._next_flight_state = DISARMED;
 }
 
 void loop() {
@@ -127,21 +126,96 @@ void loop() {
   temp_raw = temp_event.temperature;
   press_raw = pressure_event.pressure;
 
-  State state(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw, acc_raw,
-              gyro_raw, mag_raw, press_raw, temp_raw);
-  filter.add_data(&state);
-  filter.calculate_filter(&state);
+  // Save recorded data to state vector, update filter.
+  State current_timestep(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw,
+                         acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
+  filter.add_data(&current_timestep);
+  filter.calculate_filter(&current_timestep);
+
+  // Flight control loop.
+  switch (previous_timestep._next_flight_state) {
+    case DISARMED:
+      // Dummy case, only to be used if/when arming switch implemented.
+      current_timestep._next_flight_state = CALIBRATING_ESC;
+      break;
+
+    case CALIBRATING_ESC:
+      logMsg("Begin: ESC MIN_COMMAND calibration...");
+      // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC
+      // self-calibrate.
+      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+      delay(3000);
+      logMsg("END: ESC MIN_COMMAND calibration.");
+
+      current_timestep._next_flight_state = ARMED;
+      break;
+
+    case ARMED:
+      // TODO: Is the IMU y-axis vertical to the rocket?
+      // Move to POWERED_ASSENT when IMU sees >2g's of vertical acceleration.
+      if (current_timestep._acc_f[1] > 9.81 * 2) {
+        current_timestep._next_flight_state = POWERED_ASSENT;
+      }
+      break;
+
+    case POWERED_ASSENT:
+      // TODO: Do we want full power on the motors?
+      analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
+
+      // TODO: Is the IMU y-axis vertical to the rocket?
+      // Move to BALLISTIC_TRAJECTORY when IMU sees <2g's of vertical
+      // acceleration.
+      if (current_timestep._acc_f[1] < 9.81 * 2) {
+        current_timestep._next_flight_state = BALLISTIC_TRAJECTORY;
+      }
+      break;
+
+    case BALLISTIC_TRAJECTORY:
+      // TODO: Do we want full power on the motors?
+      analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
+
+      // TODO: Is this a good trigger point?
+      // Move to CHUTE_DEPLOYED when IMU sees a violent jerk from chute release.
+      if (current_timestep.acc_magnitude(false) > 9.81 * 2) {
+        current_timestep._next_flight_state = CHUTE_DEPLOYED;
+      }
+      break;
+
+    case CHUTE_DEPLOYED:
+      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
+      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
+
+      // TODO: Is this a good trigger point?
+      // Move to LANDED when IMU sees a violent jerk from landing.
+      if (current_timestep.acc_magnitude(false) > 9.81 * 2) {
+        current_timestep._next_flight_state = LANDED;
+      }
+      break;
+
+    case LANDED:
+      // Dummy case, sit here and wait for rocket to be retrieved.
+      break;
+
+    default:
+      logErr("Unknown FlightState type detected!");
+      break;
+  }
 
   {  // Write state info to SD file, log to serial
     File log = SD.open(logFile, FILE_WRITE);
     if (log) {
-      String msg = state.format_log_line();
+      String msg = current_timestep.format_log_line();
       logMsg(msg);
       log.println(msg);
       log.close();
     } else
       logErr("Error opening " + (String)logFile);
   }
+
+  previous_timestep = current_timestep;
 
   delay(10);
   logMsg("Loop took: " + (String)(millis() - begin) + "ms");

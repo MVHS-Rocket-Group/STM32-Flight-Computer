@@ -25,7 +25,8 @@ inline String FlightState_text(FlightState state) {
 struct State {
  public:
   double _time;                       // Time since boot (millis)
-  FlightState _flight_state;
+  FlightState _current_flight_state;
+  FlightState _next_flight_state;
   String _events_list;    // String list of event labels.
 
   // Raw sensor readings
@@ -85,7 +86,7 @@ struct State {
     // a String type to concatonate onto. This is because it is illegal in C++
     // to define an addition operator involving two non-"user-defined" types,
     // e.g. double and const char[3] like in the case below.
-    return (String)_time + ", " + FlightState_text(_flight_state) + ", " +
+    return (String)_time + ", " + FlightState_text(_current_flight_state) + ", " +
 
            _acc_raw[0] + ", " + _acc_raw[1] + ", " + _acc_raw[2] + ", " +
            _gyro_raw[0] + ", " + _gyro_raw[1] + ", " + _gyro_raw[2] + ", " +
