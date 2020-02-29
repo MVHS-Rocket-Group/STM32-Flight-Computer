@@ -64,8 +64,10 @@ struct State {
   int _esc_pod_1_pwm;                  // PWM value sent to ESC pod 1
   int _esc_pod_2_pwm;                  // PWM value sent to ESC pod 2
 
+  // Quick and dirty contstructor, doesn't set anything but time.
   State() { _time = millis() / 1000.0; }
 
+  // Takes in sensor readings, leaving goals/outputs to be manually set later.
   State(std::array<double, 3>& acc_raw, std::array<double, 3>& gyro_raw,
         std::array<double, 3>& mag_raw, double press_raw, double temp_raw,
         std::array<double, 3>& acc_f, std::array<double, 3>& gyro_f,
