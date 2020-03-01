@@ -125,7 +125,7 @@ void loop() {
     IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
     IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
     // Adjust acceleration measurements from g's to m/s^2.
-    for (uint8_t i = 0; i < 3; i++) acc_raw[i] = acc_raw[i] * 9.81;
+    acc_raw *= 9.81;
 
     sensors_event_t temp_event, pressure_event;
     bmp_temp->getEvent(&temp_event);

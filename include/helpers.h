@@ -72,10 +72,10 @@ bool within(double value, double assertion, double range) {
   return std::abs(value - assertion) < range;
 }
 
-// Define overloads to the /= and += operators for std::array to help with
+// Define overloads to the /=, *=, and += operators for std::array to help with
 // vector arithmentic.
-
 // https://stackoverflow.com/a/3595874/3339274
+
 template <typename T, std::size_t SIZE>
 std::array<T, SIZE>& operator/=(std::array<T, SIZE>& dividend,
                                 const T& divisor) {
@@ -83,7 +83,17 @@ std::array<T, SIZE>& operator/=(std::array<T, SIZE>& dividend,
   return dividend;
 }
 
-// https://stackoverflow.com/a/3595874/3339274
+template <typename T, std::size_t SIZE>
+std::array<T, SIZE>& operator*=(std::array<T, SIZE>& arr, const T& scalar) {
+  for (unsigned int i = 0; i < arr.size(); i++) arr[i] *= scalar;
+  return arr;
+}
+template <typename T, std::size_t SIZE>
+std::array<T, SIZE>& operator*=(const T& scalar, std::array<T, SIZE>& arr) {
+  for (unsigned int i = 0; i < arr.size(); i++) arr[i] *= scalar;
+  return arr;
+}
+
 template <typename T, std::size_t SIZE>
 std::array<T, SIZE>& operator+=(std::array<T, SIZE>& arr1,
                                 std::array<T, SIZE>& arr2) {
