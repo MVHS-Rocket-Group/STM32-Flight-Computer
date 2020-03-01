@@ -108,6 +108,7 @@ void setup() {
   }
 
   // Initialize first loop iteration with DISARMED State.
+  previous_timestep._current_flight_state = DISARMED;
   previous_timestep._next_flight_state = DISARMED;
 }
 
@@ -137,6 +138,7 @@ void loop() {
   // Save recorded data to state vector, update filter.
   State current_timestep(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw,
                          acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
+  current_timestep._current_flight_state = previous_timestep._next_flight_state;
   filter.add_data(&current_timestep);
   filter.calculate_filter(&current_timestep);
 
@@ -144,18 +146,18 @@ void loop() {
   current_timestep._external_led = {0, 0, 0};
 
   // Flight control loop.
-  switch (previous_timestep._next_flight_state) {
+  switch (current_timestep._current_flight_state) {
     case DISARMED:
       // Dummy case, only to be used if/when arming switch implemented.
       current_timestep._next_flight_state = CALIBRATING_ESC;
+      logMsg("Begin: ESC MIN_COMMAND calibration...");
+      esc_calibration_begin = millis();
       break;
 
     case CALIBRATING_ESC:
+      current_timestep._next_flight_state = CALIBRATING_ESC;
       // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC
       // self-calibrate.
-      logMsg("Begin: ESC MIN_COMMAND calibration...");
-      esc_calibration_begin = millis();
-
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
@@ -165,13 +167,14 @@ void loop() {
       current_timestep._external_led = {RGB_BLUE};
 
       // After 3 seconds, the program contunues and jumps to ARMED state.
-      if(millis() - esc_calibration_begin >= 3000) {
+      if (millis() - esc_calibration_begin >= 3000) {
         current_timestep._next_flight_state = ARMED;
         logMsg("END: ESC MIN_COMMAND calibration.");
       }
       break;
 
     case ARMED:
+      current_timestep._next_flight_state = ARMED;
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
@@ -188,6 +191,7 @@ void loop() {
       break;
 
     case POWERED_ASSENT:
+      current_timestep._next_flight_state = POWERED_ASSENT;
       // TODO: Do we want full power on the motors?
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
@@ -206,6 +210,7 @@ void loop() {
       break;
 
     case BALLISTIC_TRAJECTORY:
+      current_timestep._next_flight_state = BALLISTIC_TRAJECTORY;
       // TODO: Do we want full power on the motors?
       analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
@@ -223,6 +228,7 @@ void loop() {
       break;
 
     case CHUTE_DEPLOYED:
+      current_timestep._next_flight_state = CHUTE_DEPLOYED;
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
@@ -239,6 +245,7 @@ void loop() {
       break;
 
     case LANDED:
+      current_timestep._next_flight_state = LANDED;
       // Dummy case, sit here and wait for rocket to be retrieved.
       analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
       analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);

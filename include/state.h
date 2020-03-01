@@ -150,9 +150,9 @@ struct State {
   // Simple space-separated std::array string formatter.
   template <typename T, std::size_t SIZE>
   static String format_arr(const std::array<T, SIZE>& arr) {
-    String output;
+    String output = "\"";
     for (unsigned int i = 0; i < SIZE - 1; i++) output += arr[i] + " ";
-    output += arr[SIZE - 1];
+    output += arr[SIZE - 1] + "\"";
 
     return output;
   }
