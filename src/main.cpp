@@ -113,8 +113,7 @@ void setup() {
 }
 
 void loop() {
-  // CodeTimer("void loop()");
-  unsigned long begin = millis();
+  CodeTimer loopTimer("void loop()");
   std::array<double, 3> acc_raw;   // Acceleration (m/s^2)
   std::array<double, 3> gyro_raw;  // Angular velocity (deg/s)
   std::array<double, 3> mag_raw;   // Magnetometer values (uT)
@@ -291,5 +290,4 @@ void loop() {
   previous_timestep = current_timestep;
 
   delay(10);
-  logMsg("Loop took: " + (String)(millis() - begin) + "ms");
 }
