@@ -17,5 +17,6 @@
     "stackoverflow",
     "strikethrough",
     "struct"
-  ]
+  ],
+  "terminal.integrated.scrollback": 10000
 }
