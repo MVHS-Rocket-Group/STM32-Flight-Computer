@@ -44,7 +44,7 @@ class CodeTimer {
 
   ~CodeTimer() {
     unsigned long duration = micros() - _begin;
-    Serial.println("\"" + _name + "\" execution took " + duration + "µs.");
+    Serial.println("\"" + _name + "\" execution took " + duration/1000.0 + "ms.");
   }
 
  private:

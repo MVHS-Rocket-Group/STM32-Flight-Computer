@@ -19,13 +19,12 @@
 #define EXT_LED_G_PIN PA2
 #define EXT_LED_B_PIN PA3
 
-#define PWM_WRITE_RES 65535  // Change from default 8-bits to 16-bits
+#define PWM_WRITE_RES 12  // Change from default 8-bits to 12-bits
 
-// https://electronicshobbyists.com/arduino-pwm-tutorial/
+#define PWM_WRITE_RES 12  // Change from default 8-bits to 12-bits
 #define PWM_FREQ 1 / 0.02  // frequency (Hz) = 1 / period (sec)
-#define PWM_MAX_DUTY \
-  PWM_WRITE_RES * 2 / 20  // PWM value when firewalling the throttle.
-#define PWM_MIN_DUTY PWM_WRITE_RES * 1 / 20  // PWM value when at idle throttle.
+#define PWM_MAX_DUTY pow(2, PWM_WRITE_RES) * 2 / 20  // PWM value when firewalling the throttle.
+#define PWM_MIN_DUTY pow(2, PWM_WRITE_RES) * 1 / 20  // PWM value when at idle throttle.define PWM_POD2_PIN PB4
 
 // RGB colors for the status LED.
 #define RGB_RED 255, 0, 0

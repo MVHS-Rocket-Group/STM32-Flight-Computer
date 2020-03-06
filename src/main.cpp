@@ -113,7 +113,7 @@ void setup() {
 }
 
 void loop() {
-  // CodeTimer loopTimer("void loop()");
+  CodeTimer loopTimer("void loop()");
   std::array<double, 3> acc_raw;   // Acceleration (m/s^2)
   std::array<double, 3> gyro_raw;  // Angular velocity (deg/s)
   std::array<double, 3> mag_raw;   // Magnetometer values (uT)
@@ -153,6 +153,8 @@ void loop() {
     case DISARMED:
       // Dummy case, only to be used if/when arming switch implemented.
       current_timestep._next_flight_state = CALIBRATING_ESC;
+      current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
+      current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
       logMsg("Begin: ESC MIN_COMMAND calibration...");
       esc_calibration_begin = millis();
       break;
@@ -161,8 +163,6 @@ void loop() {
       current_timestep._next_flight_state = CALIBRATING_ESC;
       // ESC startup protocol: MIN_COMMAND for 3 seconds to let ESC
       // self-calibrate.
-      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
@@ -178,8 +178,6 @@ void loop() {
 
     case ARMED:
       current_timestep._next_flight_state = ARMED;
-      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
@@ -196,8 +194,6 @@ void loop() {
     case POWERED_ASSENT:
       current_timestep._next_flight_state = POWERED_ASSENT;
       // TODO: Do we want full power on the motors?
-      analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MAX_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MAX_DUTY;
 
@@ -215,8 +211,6 @@ void loop() {
     case BALLISTIC_TRAJECTORY:
       current_timestep._next_flight_state = BALLISTIC_TRAJECTORY;
       // TODO: Do we want full power on the motors?
-      analogWrite(PWM_POD1_PIN, PWM_MAX_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MAX_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MAX_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MAX_DUTY;
 
@@ -232,8 +226,6 @@ void loop() {
 
     case CHUTE_DEPLOYED:
       current_timestep._next_flight_state = CHUTE_DEPLOYED;
-      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
@@ -250,8 +242,6 @@ void loop() {
     case LANDED:
       current_timestep._next_flight_state = LANDED;
       // Dummy case, sit here and wait for rocket to be retrieved.
-      analogWrite(PWM_POD1_PIN, PWM_MIN_DUTY);
-      analogWrite(PWM_POD2_PIN, PWM_MIN_DUTY);
       current_timestep._esc_pod_1_pwm = PWM_MIN_DUTY;
       current_timestep._esc_pod_2_pwm = PWM_MIN_DUTY;
 
@@ -280,7 +270,11 @@ void loop() {
     current_timestep._experiment_led = {RGB_YELLOW};
   }
 
-  {  // Write state info to SD file, log to serial
+  // Write out PWM pulses to ESCs from state vector goals.
+  analogWrite(PWM_POD1_PIN, current_timestep._esc_pod_1_pwm);
+  analogWrite(PWM_POD2_PIN, current_timestep._esc_pod_2_pwm);
+
+  {  // Write state info to SD file, log to serial.
     // CodeTimer logging("Logging");
     String log_line = current_timestep.format_log_line();
     logMsg(log_line);
