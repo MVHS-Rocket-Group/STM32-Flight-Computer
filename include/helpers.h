@@ -68,7 +68,7 @@ void set_ext_led_color(uint8_t r, uint8_t g, uint8_t b) {
 
 // Returns whether or not value is within +/- range of assertion. Range should
 // be positive.
-bool within(double value, double assertion, double range) {
+inline bool within(double value, double assertion, double range) {
   return std::abs(value - assertion) < range;
 }
 

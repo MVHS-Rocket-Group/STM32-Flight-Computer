@@ -143,16 +143,19 @@ struct State {
            format_arr(_external_led) + ", " + format_arr(_experiment_led) +
            ", " + _esc_pod_1_pwm + ", " + _esc_pod_2_pwm + ", " +
 
-           _events_list;
+           (_events_list == "" ? "[None]" : _events_list);
   }
 
  private:
   // Simple space-separated std::array string formatter.
   template <typename T, std::size_t SIZE>
-  static String format_arr(const std::array<T, SIZE>& arr) {
+  static String format_arr(const std::array<T, SIZE> arr) {
     String output = "\"";
-    for (unsigned int i = 0; i < SIZE - 1; i++) output += arr[i] + " ";
-    output += arr[SIZE - 1] + "\"";
+
+    for(unsigned int i = 0; i < arr.size() - 1; i++)
+      output += (String)arr[i] + " ";
+
+    output += (String)arr[arr.size() - 1] + "\"";
 
     return output;
   }

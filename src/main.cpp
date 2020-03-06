@@ -13,7 +13,7 @@
 Adafruit_BMP280 bmp;
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
-String logFile = "";  // Path on SD card to current log file.
+String log_file = "";  // Path on SD card to current log file.
 MeanSensorFilter filter(25);
 State previous_timestep;
 
@@ -89,22 +89,22 @@ void setup() {
   {  // Log file init.
     // Find out what the latest log file is, and use the next one
     int num = 0;
-    while (logFile == "") {
+    while (log_file == "") {
       if (SD.exists("log" + (String)num + ".csv"))
         num++;
       else
-        logFile = "log" + (String)num + ".csv";
+        log_file = "log" + (String)num + ".csv";
     }
-    logMsg("Using log file: " + (String)logFile);
+    logMsg("Using log file: " + (String)log_file);
 
     // Send header line
-    File log = SD.open(logFile, FILE_WRITE);
+    File log = SD.open(log_file, FILE_WRITE);
     if (log) {
       log.println(State::header_line());
       log.close();
       logMsg("CSV log header line written");
     } else
-      logErr("Error opening " + (String)logFile);
+      logErr("Error opening " + (String)log_file);
   }
 
   // Initialize first loop iteration with DISARMED State.
@@ -113,7 +113,7 @@ void setup() {
 }
 
 void loop() {
-  CodeTimer loopTimer("void loop()");
+  // CodeTimer loopTimer("void loop()");
   std::array<double, 3> acc_raw;   // Acceleration (m/s^2)
   std::array<double, 3> gyro_raw;  // Angular velocity (deg/s)
   std::array<double, 3> mag_raw;   // Magnetometer values (uT)
@@ -121,6 +121,7 @@ void loop() {
   double temp_raw;                 // Ambient temperature (C)
 
   {  // Read data from sensors.
+    // CodeTimer dataReadTimer("sensor read");
     IMU.readAcceleration(acc_raw[0], acc_raw[1], acc_raw[2]);
     IMU.readGyroscope(gyro_raw[0], gyro_raw[1], gyro_raw[2]);
     IMU.readMagneticField(mag_raw[0], mag_raw[1], mag_raw[2]);
@@ -138,8 +139,11 @@ void loop() {
   State current_timestep(acc_raw, gyro_raw, mag_raw, press_raw, temp_raw,
                          acc_raw, gyro_raw, mag_raw, press_raw, temp_raw);
   current_timestep._current_flight_state = previous_timestep._next_flight_state;
-  filter.add_data(&current_timestep);
-  filter.calculate_filter(&current_timestep);
+  {
+    // CodeTimer recordAndFilter("filtering");
+    filter.add_data(&current_timestep);
+    filter.calculate_filter(&current_timestep);
+  }
 
   // Set default color for external LED in state vector.
   current_timestep._external_led = {0, 0, 0};
@@ -277,14 +281,15 @@ void loop() {
   }
 
   {  // Write state info to SD file, log to serial
-    File log = SD.open(logFile, FILE_WRITE);
+    // CodeTimer logging("Logging");
+    String log_line = current_timestep.format_log_line();
+    logMsg(log_line);
+    File log = SD.open(log_file, FILE_WRITE);
     if (log) {
-      String msg = current_timestep.format_log_line();
-      logMsg(msg);
-      log.println(msg);
+      log.println(log_line);
       log.close();
     } else
-      logErr("Error opening " + (String)logFile);
+      logErr("Failed to open " + log_file);
   }
 
   previous_timestep = current_timestep;
