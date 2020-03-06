@@ -13,7 +13,7 @@
 Adafruit_BMP280 bmp;
 Adafruit_Sensor *bmp_temp = bmp.getTemperatureSensor();
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
-String log_file = "";  // Path on SD card to current log file.
+String log_file_name = "";  // Path on SD card to current log file.
 MeanSensorFilter filter(25);
 State previous_timestep;
 
@@ -89,22 +89,22 @@ void setup() {
   {  // Log file init.
     // Find out what the latest log file is, and use the next one
     int num = 0;
-    while (log_file == "") {
+    while (log_file_name == "") {
       if (SD.exists("log" + (String)num + ".csv"))
         num++;
       else
-        log_file = "log" + (String)num + ".csv";
+        log_file_name = "log" + (String)num + ".csv";
     }
-    logMsg("Using log file: " + (String)log_file);
+    logMsg("Using log file: " + (String)log_file_name);
 
     // Send header line
-    File log = SD.open(log_file, FILE_WRITE);
-    if (log) {
-      log.println(State::header_line());
-      log.close();
+    File log_file = SD.open(log_file_name, FILE_WRITE);
+    if (log_file) {
+      log_file.println(State::header_line());
+      log_file.close();
       logMsg("CSV log header line written");
     } else
-      logErr("Error opening " + (String)log_file);
+      logErr("Error opening " + (String)log_file_name);
   }
 
   // Initialize first loop iteration with DISARMED State.
@@ -113,7 +113,7 @@ void setup() {
 }
 
 void loop() {
-  CodeTimer loopTimer("void loop()");
+  // CodeTimer loopTimer("void loop()");
   std::array<double, 3> acc_raw;   // Acceleration (m/s^2)
   std::array<double, 3> gyro_raw;  // Angular velocity (deg/s)
   std::array<double, 3> mag_raw;   // Magnetometer values (uT)
@@ -278,12 +278,12 @@ void loop() {
     // CodeTimer logging("Logging");
     String log_line = current_timestep.format_log_line();
     logMsg(log_line);
-    File log = SD.open(log_file, FILE_WRITE);
-    if (log) {
-      log.println(log_line);
-      log.close();
+    File log_file = SD.open(log_file_name, FILE_WRITE);
+    if (log_file) {
+      log_file.println(log_line);
+      log_file.close();
     } else
-      logErr("Failed to open " + log_file);
+      logErr("Failed to open " + log_file_name);
   }
 
   previous_timestep = current_timestep;
