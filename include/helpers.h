@@ -1,10 +1,10 @@
 #ifndef HELPERS_H
 #define HELPERS_H
 #include <Arduino.h>
-#include <Wire.h>
+#include <Wire.h>       // I2C comms support for IMU, Barometer
 #include <constants.h>  // Constants
 #include <state.h>      // State class
-#include <array>
+#include <array>        // en.cppreference.com/w/cpp/container/array
 
 // Scans for devices at all available addresses on the I2C bus and prints
 // results. Common I2C address associations:
@@ -44,7 +44,8 @@ class CodeTimer {
 
   ~CodeTimer() {
     unsigned long duration = micros() - _begin;
-    Serial.println("\"" + _name + "\" execution took " + duration/1000.0 + "ms.");
+    Serial.println("\"" + _name + "\" execution took " + duration / 1000.0 +
+                   "ms.");
   }
 
  private:

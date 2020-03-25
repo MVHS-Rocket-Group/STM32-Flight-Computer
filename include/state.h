@@ -3,8 +3,8 @@
 #include <Arduino.h>
 #include <constants.h>  // Constants
 #include <helpers.h>    // Helper objects
-#include <array>
-#include <cmath>
+#include <array>        // en.cppreference.com/w/cpp/container/array
+#include <cmath>        // Math operations
 
 enum FlightState {
   DISARMED,
@@ -39,10 +39,10 @@ inline String FlightState_text(FlightState state) {
 
 struct State {
  public:
-  double _time;  // Time since boot (seconds)
+  double _time;                       // Time since boot (seconds)
   FlightState _current_flight_state;  // Flight state in current timestep
   FlightState _next_flight_state;     // Calculated flight state
-  String _events_list;  // String list of event labels.
+  String _events_list;                // String list of event labels.
 
   // Raw sensor readings
   std::array<double, 3> _acc_raw;   // Acceleration (m/s^2)
@@ -152,7 +152,7 @@ struct State {
   static String format_arr(const std::array<T, SIZE>& arr) {
     String output = "\"";
 
-    for(unsigned int i = 0; i < arr.size() - 1; i++)
+    for (unsigned int i = 0; i < arr.size() - 1; i++)
       output += (String)arr[i] + " ";
 
     output += (String)arr[arr.size() - 1] + "\"";
