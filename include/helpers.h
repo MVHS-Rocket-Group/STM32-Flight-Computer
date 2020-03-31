@@ -1,6 +1,6 @@
 #ifndef HELPERS_H
 #define HELPERS_H
-#include <Arduino.h>
+#include <Arduino.h>    // Universal Arduino header
 #include <Wire.h>       // I2C comms support for IMU, Barometer
 #include <constants.h>  // Constants
 #include <state.h>      // State class

@@ -1,5 +1,5 @@
-#include <Adafruit_BMP280.h>  // For BMP280 Barometer
-#include <Arduino.h>
+#include <Adafruit_BMP280.h>     // For BMP280 Barometer
+#include <Arduino.h>             // Universal Arduino header
 #include <Arduino_LSM9DS1.h>     // For LSM9DS01 IMU
 #include <SD.h>                  // For SD Card
 #include <SPI.h>                 // SPI comms support for SD

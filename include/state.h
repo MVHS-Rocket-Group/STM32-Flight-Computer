@@ -1,6 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
-#include <Arduino.h>
+#include <Arduino.h>    // Universal Arduino header
 #include <constants.h>  // Constants
 #include <helpers.h>    // Helper objects
 #include <array>        // en.cppreference.com/w/cpp/container/array
